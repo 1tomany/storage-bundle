@@ -2,6 +2,8 @@
 <container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
   <parameters>
     <parameter key="1tomany.storage_service" trim="true">amazon</parameter>
+    <parameter key="1tomany.amazon_bucket" trim="true">CHANGE-ME</parameter>
+    <parameter key="1tomany.mock_bucket" trim="true">mock-bucket</parameter>
   </parameters>
   <services>
     <defaults autowire="true" autoconfigure="true"/>
@@ -9,9 +11,11 @@
     <service id="OneToMany\StorageBundle\Storage\Action\UploadFileAction"/>
     <service id="OneToMany\StorageBundle\Storage\MockStorageService">
       <tag name="1tomany.storage_service" key="mock"/>
+      <argument key="$bucket">%1tomany.mock_bucket%</argument>
     </service>
     <service id="OneToMany\StorageBundle\Storage\AmazonStorageService">
       <tag name="1tomany.storage_service" key="amazon"/>
+      <argument key="$bucket">%1tomany.amazon_bucket%</argument>
     </service>
     <service id="OneToMany\StorageBundle\Storage\ServiceFactory">
       <argument type="tagged_locator" tag="1tomany.storage_service" index-by="key"/>

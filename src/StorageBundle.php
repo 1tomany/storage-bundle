@@ -8,7 +8,6 @@ use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
 class StorageBundle extends AbstractBundle
 {
-
     /**
      * @param array<string, mixed> $config
      */
@@ -16,5 +15,4 @@ class StorageBundle extends AbstractBundle
     {
         $configurator->import('../config/services.xml');
     }
-
 }
