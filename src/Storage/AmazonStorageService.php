@@ -75,8 +75,14 @@ final readonly class AmazonStorageService implements StorageServiceInterface
             ]);
 
             // Resolve Storage Options
+            $contentType = $request->type;
+
+            if (!$contentType && function_exists('mime_content_type')) {
+                $contentType = mime_content_type($localFileHandle);
+            }
+
             $options = $this->resolveOptions(...[
-                'contentType' => $request->type,
+                'type' => $contentType,
             ]);
 
             // Upload File to Amazon S3
@@ -111,8 +117,8 @@ final readonly class AmazonStorageService implements StorageServiceInterface
     /**
      * @return array<string, array<string, string>>
      */
-    private function resolveOptions(string $contentType): array
+    private function resolveOptions(null|false|string $type): array
     {
-        return ['params' => ['ContentType' => $contentType]];
+        return ['params' => ['ContentType' => $type ? $type : 'application/octet-stream']];
     }
 }
