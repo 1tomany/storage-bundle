@@ -1,6 +1,6 @@
 <?php
 
-namespace App\File\Service\Storage\Request;
+namespace OneToMany\StorageBundle\Storage\Request;
 
 final readonly class UploadFileRequest
 {

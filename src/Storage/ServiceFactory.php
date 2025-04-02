@@ -1,8 +1,8 @@
 <?php
 
-namespace App\File\Service\Storage;
+namespace OneToMany\StorageBundle\Storage;
 
-use App\File\Service\Storage\Exception\InvalidStorageServiceException;
+use OneToMany\StorageBundle\Storage\Exception\InvalidStorageServiceException;
 use Psr\Container\ContainerInterface;
 
 final readonly class ServiceFactory

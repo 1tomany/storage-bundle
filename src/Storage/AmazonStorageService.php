@@ -1,14 +1,14 @@
 <?php
 
-namespace App\File\Service\Storage;
+namespace OneToMany\StorageBundle\Storage;
 
-use App\File\Service\Storage\Exception\DownloadingFileFailedException;
-use App\File\Service\Storage\Exception\LocalFileNotReadableException;
-use App\File\Service\Storage\Exception\UploadingFileFailedException;
-use App\File\Service\Storage\Record\LocalFileRecord;
-use App\File\Service\Storage\Record\RemoteFileRecord;
-use App\File\Service\Storage\Request\DownloadFileRequest;
-use App\File\Service\Storage\Request\UploadFileRequest;
+use OneToMany\StorageBundle\Storage\Exception\DownloadingFileFailedException;
+use OneToMany\StorageBundle\Storage\Exception\LocalFileNotReadableException;
+use OneToMany\StorageBundle\Storage\Exception\UploadingFileFailedException;
+use OneToMany\StorageBundle\Storage\Record\LocalFileRecord;
+use OneToMany\StorageBundle\Storage\Record\RemoteFileRecord;
+use OneToMany\StorageBundle\Storage\Request\DownloadFileRequest;
+use OneToMany\StorageBundle\Storage\Request\UploadFileRequest;
 use Aws\S3\S3Client;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -25,7 +25,7 @@ final readonly class AmazonStorageService implements StorageServiceInterface
     }
 
     /**
-     * @see App\File\Service\Storage\StorageServiceInterface
+     * @see OneToMany\StorageBundle\Storage\StorageServiceInterface
      */
     public function download(DownloadFileRequest $request): LocalFileRecord
     {
@@ -56,7 +56,7 @@ final readonly class AmazonStorageService implements StorageServiceInterface
     }
 
     /**
-     * @see App\File\Service\Storage\StorageServiceInterface
+     * @see OneToMany\StorageBundle\Storage\StorageServiceInterface
      */
     public function upload(UploadFileRequest $request): RemoteFileRecord
     {

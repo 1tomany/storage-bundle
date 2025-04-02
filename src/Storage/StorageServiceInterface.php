@@ -1,11 +1,11 @@
 <?php
 
-namespace App\File\Service\Storage;
+namespace OneToMany\StorageBundle\Storage;
 
-use App\File\Service\Storage\Record\LocalFileRecord;
-use App\File\Service\Storage\Record\RemoteFileRecord;
-use App\File\Service\Storage\Request\DownloadFileRequest;
-use App\File\Service\Storage\Request\UploadFileRequest;
+use OneToMany\StorageBundle\Storage\Record\LocalFileRecord;
+use OneToMany\StorageBundle\Storage\Record\RemoteFileRecord;
+use OneToMany\StorageBundle\Storage\Request\DownloadFileRequest;
+use OneToMany\StorageBundle\Storage\Request\UploadFileRequest;
 
 interface StorageServiceInterface
 {

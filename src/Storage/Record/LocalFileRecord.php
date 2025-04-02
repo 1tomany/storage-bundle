@@ -1,6 +1,6 @@
 <?php
 
-namespace App\File\Service\Storage\Record;
+namespace OneToMany\StorageBundle\Storage\Record;
 
 final readonly class LocalFileRecord implements \Stringable
 {
