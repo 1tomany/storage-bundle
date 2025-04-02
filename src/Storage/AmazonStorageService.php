@@ -2,6 +2,7 @@
 
 namespace OneToMany\StorageBundle\Storage;
 
+use Aws\S3\S3Client;
 use OneToMany\StorageBundle\Storage\Exception\DownloadingFileFailedException;
 use OneToMany\StorageBundle\Storage\Exception\LocalFileNotReadableException;
 use OneToMany\StorageBundle\Storage\Exception\UploadingFileFailedException;
@@ -9,7 +10,6 @@ use OneToMany\StorageBundle\Storage\Record\LocalFileRecord;
 use OneToMany\StorageBundle\Storage\Record\RemoteFileRecord;
 use OneToMany\StorageBundle\Storage\Request\DownloadFileRequest;
 use OneToMany\StorageBundle\Storage\Request\UploadFileRequest;
-use Aws\S3\S3Client;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
