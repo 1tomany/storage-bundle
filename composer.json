@@ -1,0 +1,37 @@
+{
+    "name": "1tomany/storage-bundle",
+    "description": "Symfony bundle to manage remote storage services",
+    "license": "MIT",
+    "type": "symfony-bundle",
+    "minimum-stability": "stable",
+    "keywords": [
+        "amazon",
+        "aws",
+        "s3",
+        "azure",
+        "blob"
+    ],
+    "require": {
+        "php": ">=8.4",
+        "aws/aws-sdk-php-symfony": "^2.8",
+        "symfony/dependency-injection": "^7.2",
+        "symfony/http-kernel": "^7.2"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "OneToMany\\StorageBundle\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Vic Cherubini",
+            "email": "vcherubini@gmail.com"
+        }
+    ],
+    "config": {
+        "sort-packages": true
+    }
+}
