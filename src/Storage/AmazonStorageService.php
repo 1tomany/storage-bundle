@@ -117,7 +117,7 @@ final readonly class AmazonStorageService implements StorageServiceInterface
     /**
      * @return array<string, array<string, string>>
      */
-    private function resolveOptions(null|false|string $type): array
+    private function resolveOptions(false|string|null $type): array
     {
         return ['params' => ['ContentType' => $type ? $type : 'application/octet-stream']];
     }
