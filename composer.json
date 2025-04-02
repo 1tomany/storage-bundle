@@ -1,6 +1,5 @@
 {
     "name": "1tomany/storage-bundle",
-    "version": "1.0.0",
     "description": "Symfony bundle to manage remote storage services",
     "license": "MIT",
     "type": "symfony-bundle",
