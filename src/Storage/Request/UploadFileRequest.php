@@ -7,18 +7,18 @@ final readonly class UploadFileRequest
     public function __construct(
         public string $path,
         public string $key,
-        public string $media,
+        public string $type,
         public bool $isPublic = true,
     ) {
     }
 
-    public static function public(string $path, string $key, string $media): self
+    public static function public(string $path, string $key, string $type): self
     {
-        return new self($path, $key, $media, true);
+        return new self($path, $key, $type, true);
     }
 
-    public static function private(string $path, string $key, string $media): self
+    public static function private(string $path, string $key, string $type): self
     {
-        return new self($path, $key, $media, false);
+        return new self($path, $key, $type, false);
     }
 }

@@ -42,13 +42,17 @@ final readonly class AmazonStorageService implements StorageServiceInterface
             }
 
             $path = $this->filesystem->tempnam(
-                sys_get_temp_dir(), '__fs__file_'
+                sys_get_temp_dir(), '__1n__file_'
             );
 
             $this->filesystem->dumpFile(
                 $path, $body->getContents()
             );
         } catch (\Exception $e) {
+            if (isset($path) && file_exists($path)) {
+                $this->filesystem->remove($path);
+            }
+
             throw new DownloadingFileFailedException($request->key, $e);
         }
 
@@ -60,13 +64,11 @@ final readonly class AmazonStorageService implements StorageServiceInterface
      */
     public function upload(UploadFileRequest $request): RemoteFileRecord
     {
+        if (!$localFileHandle = fopen($request->path, 'r')) {
+            throw new LocalFileNotReadableException($request->path);
+        }
+
         try {
-            $fileContents = @file_get_contents($request->path);
-
-            if (false === $fileContents) {
-                throw new LocalFileNotReadableException($request->path);
-            }
-
             // Resolve Access Control List
             $accessControl = $this->resolveAcl(...[
                 'public' => $request->isPublic,
@@ -74,14 +76,14 @@ final readonly class AmazonStorageService implements StorageServiceInterface
 
             // Resolve Storage Options
             $options = $this->resolveOptions(...[
-                'mediaType' => $request->media,
+                'contentType' => $request->type,
             ]);
 
             // Upload File to Amazon S3
             $this->s3Client->upload(...[
                 'bucket' => $this->bucket,
                 'key' => $request->key,
-                'body' => $fileContents,
+                'body' => $localFileHandle,
                 'acl' => $accessControl,
                 'options' => $options,
             ]);
@@ -93,8 +95,8 @@ final readonly class AmazonStorageService implements StorageServiceInterface
         } catch (\Exception $e) {
             throw new UploadingFileFailedException($e);
         } finally {
-            if (isset($fileContents)) {
-                unset($fileContents);
+            if (is_resource($localFileHandle)) {
+                fclose($localFileHandle);
             }
         }
 
@@ -109,8 +111,8 @@ final readonly class AmazonStorageService implements StorageServiceInterface
     /**
      * @return array<string, array<string, string>>
      */
-    private function resolveOptions(string $mediaType): array
+    private function resolveOptions(string $contentType): array
     {
-        return ['params' => ['ContentType' => $mediaType]];
+        return ['params' => ['ContentType' => $contentType]];
     }
 }
