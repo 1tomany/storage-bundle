@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
-  <!-- <parameters>
-    <parameter key="1tomany.rasterization_service" trim="true">poppler</parameter>
-  </parameters> -->
+  <parameters>
+    <parameter key="1tomany.storage_service" trim="true">amazon</parameter>
+  </parameters>
   <services>
     <defaults autowire="true" autoconfigure="true"/>
-    <service id="OneToMany\PdfToImage\Action\RasterizeFileAction"/>
-    <service id="OneToMany\PdfToImage\MockRasterService">
-      <tag name="1tomany.raster_service" key="mock"/>
+    <service id="OneToMany\StorageBundle\Storage\Action\DownloadFileAction"/>
+    <service id="OneToMany\StorageBundle\Storage\Action\UploadFileAction"/>
+    <service id="OneToMany\StorageBundle\Storage\MockStorageService">
+      <tag name="1tomany.storage_service" key="mock"/>
     </service>
-    <service id="OneToMany\PdfToImage\PopplerRasterService">
-      <tag name="1tomany.raster_service" key="poppler"/>
+    <service id="OneToMany\StorageBundle\Storage\AmazonStorageService">
+      <tag name="1tomany.storage_service" key="amazon"/>
     </service>
-    <service id="OneToMany\PdfToImage\ServiceFactory">
-      <argument type="tagged_locator" tag="1tomany.raster_service" index-by="key"/>
+    <service id="OneToMany\StorageBundle\Storage\ServiceFactory">
+      <argument type="tagged_locator" tag="1tomany.storage_service" index-by="key"/>
     </service>
-    <service id="OneToMany\PdfToImage\RasterServiceInterface">
-      <factory service="OneToMany\PdfToImage\ServiceFactory" method="create"/>
-      <argument>%1tomany.rasterization_service%</argument>
+    <service id="OneToMany\StorageBundle\Storage\StorageServiceInterface">
+      <factory service="OneToMany\StorageBundle\Storage\ServiceFactory" method="create"/>
+      <argument>%1tomany.storage_service%</argument>
     </service>
   </services>
 </container>
