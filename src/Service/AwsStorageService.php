@@ -15,7 +15,6 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 use function function_exists;
-use function is_string;
 use function mime_content_type;
 use function sys_get_temp_dir;
 

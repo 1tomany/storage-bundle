@@ -10,6 +10,16 @@ use PHPUnit\Framework\TestCase;
 #[Group('UnitTests')]
 final class UploadFileRequestTest extends TestCase
 {
+    public function testCreatingPublicRequestSetsAclAsPublic(): void
+    {
+        $this->assertTrue(UploadFileRequest::public('', '')->isPublic);
+    }
+
+    public function testCreatingPrivateRequestSetsAclAsPublic(): void
+    {
+        $this->assertFalse(UploadFileRequest::private('', '')->isPublic);
+    }
+
     public function testGettingUrlUsesCanonicalUrlWhenCustomUrlIsEmpty(): void
     {
         $remoteKey = 'file.jpeg';
