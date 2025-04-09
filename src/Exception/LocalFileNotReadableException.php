@@ -8,6 +8,6 @@ final class LocalFileNotReadableException extends \RuntimeException implements E
 {
     public function __construct(string $filePath, ?\Throwable $previous = null, int $code = 0)
     {
-        parent::__construct(sprintf('The file "%s" is not readable and could not be uploaded.', $filePath), $code, $previous);
+        parent::__construct(sprintf('The file "%s" could not be uploaded because it is not readable or does not exist.', $filePath), $code, $previous);
     }
 }

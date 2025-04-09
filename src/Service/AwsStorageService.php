@@ -46,7 +46,7 @@ final readonly class AwsStorageService implements StorageServiceInterface
             $body = $file->get('Body');
 
             if (!$body instanceof StreamInterface) {
-                throw new \RuntimeException('An error occurred when attempting to stream the contents of the downloaded file.');
+                throw new \RuntimeException('The contents of the file could not be streamed.');
             }
 
             $filePath = $this->filesystem->tempnam(
