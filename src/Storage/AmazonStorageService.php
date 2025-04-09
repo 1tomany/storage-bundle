@@ -42,7 +42,7 @@ final readonly class AmazonStorageService implements StorageServiceInterface
                 throw new \RuntimeException('An error occurred when attempting to stream the contents of the downloaded file.');
             }
 
-            $path = $this->filesystem->tempnam(
+            $filePath = $this->filesystem->tempnam(
                 \sys_get_temp_dir(), '__1n__file_'
             );
         } catch (\Exception $e) {
@@ -51,17 +51,17 @@ final readonly class AmazonStorageService implements StorageServiceInterface
 
         try {
             $this->filesystem->dumpFile(
-                $path, $body->getContents()
+                $filePath, $body->getContents()
             );
         } catch (\Exception $e) {
-            if ($this->filesystem->exists($path)) {
-                $this->filesystem->remove($path);
+            if ($this->filesystem->exists($filePath)) {
+                $this->filesystem->remove($filePath);
             }
 
             throw new DownloadingFileFailedException($request->key, $e);
         }
 
-        return new LocalFileRecord($path);
+        return new LocalFileRecord($filePath);
     }
 
     /**
