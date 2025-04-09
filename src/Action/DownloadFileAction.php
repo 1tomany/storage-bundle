@@ -1,10 +1,10 @@
 <?php
 
-namespace OneToMany\StorageBundle\Storage\Action;
+namespace OneToMany\StorageBundle\Action;
 
-use OneToMany\StorageBundle\Storage\Record\LocalFileRecord;
-use OneToMany\StorageBundle\Storage\Request\DownloadFileRequest;
-use OneToMany\StorageBundle\Storage\StorageServiceInterface;
+use OneToMany\StorageBundle\Record\LocalFileRecord;
+use OneToMany\StorageBundle\Request\DownloadFileRequest;
+use OneToMany\StorageBundle\StorageServiceInterface;
 
 final readonly class DownloadFileAction
 {

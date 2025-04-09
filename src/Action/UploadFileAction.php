@@ -1,10 +1,10 @@
 <?php
 
-namespace OneToMany\StorageBundle\Storage\Action;
+namespace OneToMany\StorageBundle\Action;
 
-use OneToMany\StorageBundle\Storage\Record\RemoteFileRecord;
-use OneToMany\StorageBundle\Storage\Request\UploadFileRequest;
-use OneToMany\StorageBundle\Storage\StorageServiceInterface;
+use OneToMany\StorageBundle\Record\RemoteFileRecord;
+use OneToMany\StorageBundle\Request\UploadFileRequest;
+use OneToMany\StorageBundle\StorageServiceInterface;
 
 final readonly class UploadFileAction
 {

@@ -1,20 +1,20 @@
 <?php
 
-namespace OneToMany\StorageBundle\Storage;
+namespace OneToMany\StorageBundle\Service;
 
 use Aws\S3\S3Client;
-use OneToMany\StorageBundle\Storage\Exception\DownloadingFileFailedException;
-use OneToMany\StorageBundle\Storage\Exception\LocalFileNotReadableException;
-use OneToMany\StorageBundle\Storage\Exception\UploadingFileFailedException;
-use OneToMany\StorageBundle\Storage\Record\LocalFileRecord;
-use OneToMany\StorageBundle\Storage\Record\RemoteFileRecord;
-use OneToMany\StorageBundle\Storage\Request\DownloadFileRequest;
-use OneToMany\StorageBundle\Storage\Request\UploadFileRequest;
+use OneToMany\StorageBundle\Exception\DownloadingFileFailedException;
+use OneToMany\StorageBundle\Exception\LocalFileNotReadableException;
+use OneToMany\StorageBundle\Exception\UploadingFileFailedException;
+use OneToMany\StorageBundle\Record\LocalFileRecord;
+use OneToMany\StorageBundle\Record\RemoteFileRecord;
+use OneToMany\StorageBundle\Request\DownloadFileRequest;
+use OneToMany\StorageBundle\Request\UploadFileRequest;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-final readonly class AmazonStorageService implements StorageServiceInterface
+final readonly class AwsStorageService implements StorageServiceInterface
 {
     private Filesystem $filesystem;
 
@@ -26,7 +26,7 @@ final readonly class AmazonStorageService implements StorageServiceInterface
     }
 
     /**
-     * @see OneToMany\StorageBundle\Storage\StorageServiceInterface
+     * @see OneToMany\StorageBundle\StorageServiceInterface
      */
     public function download(DownloadFileRequest $request): LocalFileRecord
     {
@@ -65,7 +65,7 @@ final readonly class AmazonStorageService implements StorageServiceInterface
     }
 
     /**
-     * @see OneToMany\StorageBundle\Storage\StorageServiceInterface
+     * @see OneToMany\StorageBundle\StorageServiceInterface
      */
     public function upload(UploadFileRequest $request): RemoteFileRecord
     {

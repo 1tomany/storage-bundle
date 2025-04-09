@@ -1,6 +1,6 @@
 <?php
 
-namespace OneToMany\StorageBundle\Storage\Exception;
+namespace OneToMany\StorageBundle\Exception;
 
 final class LocalFileNotReadableException extends \RuntimeException implements ExceptionInterface
 {

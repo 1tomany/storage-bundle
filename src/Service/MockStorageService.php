@@ -1,11 +1,11 @@
 <?php
 
-namespace OneToMany\StorageBundle\Storage;
+namespace OneToMany\StorageBundle\Service;
 
-use OneToMany\StorageBundle\Storage\Record\LocalFileRecord;
-use OneToMany\StorageBundle\Storage\Record\RemoteFileRecord;
-use OneToMany\StorageBundle\Storage\Request\DownloadFileRequest;
-use OneToMany\StorageBundle\Storage\Request\UploadFileRequest;
+use OneToMany\StorageBundle\Record\LocalFileRecord;
+use OneToMany\StorageBundle\Record\RemoteFileRecord;
+use OneToMany\StorageBundle\Request\DownloadFileRequest;
+use OneToMany\StorageBundle\Request\UploadFileRequest;
 
 final readonly class MockStorageService implements StorageServiceInterface
 {
@@ -14,7 +14,7 @@ final readonly class MockStorageService implements StorageServiceInterface
     }
 
     /**
-     * @see OneToMany\StorageBundle\Storage\StorageServiceInterface
+     * @see OneToMany\StorageBundle\StorageServiceInterface
      */
     public function download(DownloadFileRequest $request): LocalFileRecord
     {
@@ -22,7 +22,7 @@ final readonly class MockStorageService implements StorageServiceInterface
     }
 
     /**
-     * @see OneToMany\StorageBundle\Storage\StorageServiceInterface
+     * @see OneToMany\StorageBundle\StorageServiceInterface
      */
     public function upload(UploadFileRequest $request): RemoteFileRecord
     {

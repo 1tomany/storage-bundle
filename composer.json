@@ -30,6 +30,11 @@
             "OneToMany\\StorageBundle\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "OneToMany\\StorageBundle\\Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Vic Cherubini",
