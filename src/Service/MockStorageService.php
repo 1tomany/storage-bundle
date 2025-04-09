@@ -16,8 +16,7 @@ final readonly class MockStorageService implements StorageServiceInterface
     public function __construct(
         private string $bucket,
         private ?string $customUrl = null,
-    )
-    {
+    ) {
     }
 
     /**

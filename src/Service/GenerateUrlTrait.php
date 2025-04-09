@@ -8,8 +8,7 @@ trait GenerateUrlTrait
         string $canonicalUrl,
         ?string $customUrl,
         string $remoteKey,
-    ): string
-    {
+    ): string {
         $customUrl = rtrim((string) $customUrl, '/');
 
         if (empty($customUrl)) {
