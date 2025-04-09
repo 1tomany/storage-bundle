@@ -2,6 +2,9 @@
 
 namespace OneToMany\StorageBundle\Service;
 
+use function rtrim;
+use function trim;
+
 trait GenerateUrlTrait
 {
     private function generateUrl(
@@ -9,7 +12,8 @@ trait GenerateUrlTrait
         ?string $customUrl,
         string $remoteKey,
     ): string {
-        $customUrl = rtrim((string) $customUrl, '/');
+        // Ensure the custom URL is a slim as possible
+        $customUrl = rtrim(trim($customUrl ?? ''), '/');
 
         if (empty($customUrl)) {
             return $canonicalUrl;

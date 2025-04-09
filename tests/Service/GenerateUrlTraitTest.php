@@ -24,7 +24,7 @@ final class GenerateUrlTraitTest extends TestCase
     }
 
     #[DataProvider('providerCustomUrl')]
-    public function testGeneratingUrlStripsEndingSlashFromCustomUrl(string $customUrl): void
+    public function testGeneratingUrlStripsEndingSlashesFromCustomUrl(string $customUrl): void
     {
         $remoteKey = 'file.jpeg';
 
