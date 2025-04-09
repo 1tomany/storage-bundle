@@ -26,8 +26,8 @@ final readonly class MockStorageService implements StorageServiceInterface
      */
     public function upload(UploadFileRequest $request): RemoteFileRecord
     {
-        $url = vsprintf('https://remote-files.mock/%s/%s', [
-            $this->bucket, $request->key,
+        $url = \vsprintf('https://remote-files.mock/%s/%s', [
+            $this->bucket, $request->remoteKey,
         ]);
 
         return new RemoteFileRecord($url);

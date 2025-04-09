@@ -11,6 +11,7 @@ use OneToMany\StorageBundle\Storage\Record\RemoteFileRecord;
 use OneToMany\StorageBundle\Storage\Request\DownloadFileRequest;
 use OneToMany\StorageBundle\Storage\Request\UploadFileRequest;
 use Psr\Http\Message\StreamInterface;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 final readonly class AmazonStorageService implements StorageServiceInterface
@@ -42,14 +43,18 @@ final readonly class AmazonStorageService implements StorageServiceInterface
             }
 
             $path = $this->filesystem->tempnam(
-                sys_get_temp_dir(), '__1n__file_'
+                \sys_get_temp_dir(), '__1n__file_'
             );
+        } catch (\Exception $e) {
+            throw new DownloadingFileFailedException($request->key, $e);
+        }
 
+        try {
             $this->filesystem->dumpFile(
                 $path, $body->getContents()
             );
         } catch (\Exception $e) {
-            if (isset($path) && file_exists($path)) {
+            if ($this->filesystem->exists($path)) {
                 $this->filesystem->remove($path);
             }
 
@@ -64,61 +69,59 @@ final readonly class AmazonStorageService implements StorageServiceInterface
      */
     public function upload(UploadFileRequest $request): RemoteFileRecord
     {
-        if (!$localFileHandle = fopen($request->path, 'r')) {
-            throw new LocalFileNotReadableException($request->path);
+        try {
+            if (!$this->filesystem->exists($request->filePath)) {
+                throw new LocalFileNotReadableException($request->filePath);
+            }
+        } catch (IOExceptionInterface $e) {
+            throw new LocalFileNotReadableException($request->filePath, $e);
         }
 
         try {
-            // Resolve Access Control List
             $accessControl = $this->resolveAcl(...[
-                'public' => $request->isPublic,
+                'isPublic' => $request->isPublic,
             ]);
 
-            // Resolve Storage Options
-            $contentType = $request->type;
+            $contentType = $this->resolveContentType(...[
+                'filePath' => $request->filePath,
+                'contentType' => $request->contentType,
+            ]);
 
-            if (!$contentType && function_exists('mime_content_type')) {
-                $contentType = mime_content_type($localFileHandle);
+            $result = $this->s3Client->putObject([
+                'Bucket' => $this->bucket,
+                'ACL' => $accessControl,
+                'Key' => $request->remoteKey,
+                'Content-Type' => $contentType,
+                'SourceFile' => $request->filePath,
+            ]);
+
+            if (!\is_string($url = $result->get('ObjectURL'))) {
+                throw new \RuntimeException('no url generated');
             }
-
-            $options = $this->resolveOptions(...[
-                'type' => $contentType,
-            ]);
-
-            // Upload File to Amazon S3
-            $this->s3Client->upload(...[
-                'bucket' => $this->bucket,
-                'key' => $request->key,
-                'body' => $localFileHandle,
-                'acl' => $accessControl,
-                'options' => $options,
-            ]);
-
-            // Fetch URL to Confirm Upload
-            $url = $this->s3Client->getObjectUrl(
-                $this->bucket, $request->key
-            );
         } catch (\Exception $e) {
             throw new UploadingFileFailedException($e);
-        } finally {
-            if (is_resource($localFileHandle)) {
-                fclose($localFileHandle);
-            }
         }
 
-        return new RemoteFileRecord($url);
+        return new RemoteFileRecord($request->getUrl($url));
     }
 
-    private function resolveAcl(bool $public): string
+    private function resolveAcl(bool $isPublic): string
     {
-        return $public ? 'public-read' : 'private';
+        return $isPublic ? 'public-read' : 'private';
     }
 
-    /**
-     * @return array<string, array<string, string>>
-     */
-    private function resolveOptions(false|string|null $type): array
+    private function resolveContentType(string $filePath, ?string $contentType): string
     {
-        return ['params' => ['ContentType' => $type ? $type : 'application/octet-stream']];
+        if (!empty($contentType)) {
+            return $contentType;
+        }
+
+        $contentType = null;
+
+        if (\function_exists('mime_content_type')) {
+            $contentType = \mime_content_type($filePath);
+        }
+
+        return $contentType ?: 'application/octet-stream';
     }
 }
