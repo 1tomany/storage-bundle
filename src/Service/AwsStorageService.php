@@ -40,7 +40,7 @@ final readonly class AwsStorageService implements StorageServiceInterface
         try {
             $file = $this->s3Client->getObject([
                 'Bucket' => $this->bucket,
-                'Key' => $request->key,
+                'Key' => $request->remoteKey,
             ]);
 
             $body = $file->get('Body');
@@ -53,7 +53,7 @@ final readonly class AwsStorageService implements StorageServiceInterface
                 sys_get_temp_dir(), '__1n__file_'
             );
         } catch (\Exception $e) {
-            throw new DownloadingFileFailedException($request->key, $e);
+            throw new DownloadingFileFailedException($request->remoteKey, $e);
         }
 
         try {
@@ -65,7 +65,7 @@ final readonly class AwsStorageService implements StorageServiceInterface
                 $this->filesystem->remove($filePath);
             }
 
-            throw new DownloadingFileFailedException($request->key, $e);
+            throw new DownloadingFileFailedException($request->remoteKey, $e);
         }
 
         return new LocalFileRecord($filePath);

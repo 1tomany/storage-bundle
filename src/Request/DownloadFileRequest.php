@@ -4,7 +4,7 @@ namespace OneToMany\StorageBundle\Request;
 
 final readonly class DownloadFileRequest
 {
-    public function __construct(public string $key)
+    public function __construct(public string $remoteKey)
     {
     }
 }
