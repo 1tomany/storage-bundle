@@ -31,7 +31,7 @@ final class MockStorageServiceTest extends TestCase
         $objectUrl = $serviceUrl.'/'.$bucket.'/'.$remoteKey;
 
         $record = new MockStorageService($bucket, null)->upload(...[
-            'request' => UploadFileRequest::public($remoteKey, $remoteKey)
+            'request' => UploadFileRequest::public($remoteKey, $remoteKey),
         ]);
 
         $this->assertEquals($objectUrl, $record->url);
