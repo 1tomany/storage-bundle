@@ -20,11 +20,14 @@ use function sys_get_temp_dir;
 
 final readonly class AwsStorageService implements StorageServiceInterface
 {
+    use GenerateUrlTrait;
+
     private Filesystem $filesystem;
 
     public function __construct(
         private S3Client $s3Client,
         private string $bucket,
+        private ?string $customUrl,
     ) {
         $this->filesystem = new Filesystem();
     }
@@ -99,13 +102,19 @@ final readonly class AwsStorageService implements StorageServiceInterface
                 'SourceFile' => $request->filePath,
             ]);
 
-            /** @var non-empty-string $url */
-            $url = $result->get('ObjectURL');
+            /** @var non-empty-string $canonicalUrl */
+            $canonicalUrl = $result->get('ObjectURL');
         } catch (\Exception $e) {
             throw new UploadingFileFailedException($e);
         }
 
-        return new RemoteFileRecord($request->getUrl($url));
+        $objectUrl = $this->generateUrl(...[
+            'canonicalUrl' => $canonicalUrl,
+            'customUrl' => $this->customUrl,
+            'remoteKey' => $request->remoteKey,
+        ]);
+
+        return new RemoteFileRecord($objectUrl);
     }
 
     private function resolveAcl(bool $isPublic): string
