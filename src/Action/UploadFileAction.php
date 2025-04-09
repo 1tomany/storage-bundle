@@ -4,7 +4,7 @@ namespace OneToMany\StorageBundle\Action;
 
 use OneToMany\StorageBundle\Record\RemoteFileRecord;
 use OneToMany\StorageBundle\Request\UploadFileRequest;
-use OneToMany\StorageBundle\StorageServiceInterface;
+use OneToMany\StorageBundle\Service\StorageServiceInterface;
 
 final readonly class UploadFileAction
 {

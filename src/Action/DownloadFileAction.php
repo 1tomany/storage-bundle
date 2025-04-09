@@ -4,7 +4,7 @@ namespace OneToMany\StorageBundle\Action;
 
 use OneToMany\StorageBundle\Record\LocalFileRecord;
 use OneToMany\StorageBundle\Request\DownloadFileRequest;
-use OneToMany\StorageBundle\StorageServiceInterface;
+use OneToMany\StorageBundle\Service\StorageServiceInterface;
 
 final readonly class DownloadFileAction
 {

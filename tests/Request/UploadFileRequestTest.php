@@ -10,7 +10,6 @@ use PHPUnit\Framework\TestCase;
 #[Group('UnitTests')]
 final class UploadFileRequestTest extends TestCase
 {
-
     public function testGettingUrlUsesCanonicalUrlWhenCustomUrlIsEmpty(): void
     {
         $remoteKey = 'file.jpeg';
@@ -28,8 +27,7 @@ final class UploadFileRequestTest extends TestCase
     public function testGettingUrlStripsEndingSlashFromCustomUrl(
         string $customUrl,
         string $strippedCustomUrl,
-    ): void
-    {
+    ): void {
         $remoteKey = 'file.jpeg';
 
         $objectUrl = $strippedCustomUrl.'/'.$remoteKey;

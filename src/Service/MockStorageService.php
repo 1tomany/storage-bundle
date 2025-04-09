@@ -7,6 +7,8 @@ use OneToMany\StorageBundle\Record\RemoteFileRecord;
 use OneToMany\StorageBundle\Request\DownloadFileRequest;
 use OneToMany\StorageBundle\Request\UploadFileRequest;
 
+use function vsprintf;
+
 final readonly class MockStorageService implements StorageServiceInterface
 {
     public function __construct(private string $bucket)
@@ -26,7 +28,7 @@ final readonly class MockStorageService implements StorageServiceInterface
      */
     public function upload(UploadFileRequest $request): RemoteFileRecord
     {
-        $url = \vsprintf('https://remote-files.mock/%s/%s', [
+        $url = vsprintf('https://remote-files.mock/%s/%s', [
             $this->bucket, $request->remoteKey,
         ]);
 

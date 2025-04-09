@@ -14,6 +14,11 @@ use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
+use function function_exists;
+use function is_string;
+use function mime_content_type;
+use function sys_get_temp_dir;
+
 final readonly class AwsStorageService implements StorageServiceInterface
 {
     private Filesystem $filesystem;
@@ -43,7 +48,7 @@ final readonly class AwsStorageService implements StorageServiceInterface
             }
 
             $filePath = $this->filesystem->tempnam(
-                \sys_get_temp_dir(), '__1n__file_'
+                sys_get_temp_dir(), '__1n__file_'
             );
         } catch (\Exception $e) {
             throw new DownloadingFileFailedException($request->key, $e);
@@ -95,9 +100,8 @@ final readonly class AwsStorageService implements StorageServiceInterface
                 'SourceFile' => $request->filePath,
             ]);
 
-            if (!\is_string($url = $result->get('ObjectURL'))) {
-                throw new \RuntimeException('no url generated');
-            }
+            /** @var non-empty-string $url */
+            $url = $result->get('ObjectURL');
         } catch (\Exception $e) {
             throw new UploadingFileFailedException($e);
         }
@@ -118,8 +122,8 @@ final readonly class AwsStorageService implements StorageServiceInterface
 
         $contentType = null;
 
-        if (\function_exists('mime_content_type')) {
-            $contentType = \mime_content_type($filePath);
+        if (function_exists('mime_content_type')) {
+            $contentType = mime_content_type($filePath);
         }
 
         return $contentType ?: 'application/octet-stream';
