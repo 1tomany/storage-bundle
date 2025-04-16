@@ -130,7 +130,7 @@ final readonly class UploadFileHandler
 }
 ```
 
-However, I **do not** recommend using the `StorageServiceInterface` directly. Instead, you should use the corresponding action class. There are two action classes:
+However, I **do not** recommend using the `StorageServiceInterface` directly. Instead, you should use an action class. There are two action classes:
 
 - `OneToMany\StorageBundle\Action\DownloadFileAction`
 - `OneToMany\StorageBundle\Action\UploadFileAction`
@@ -169,10 +169,10 @@ final readonly class UploadFileHandler
 ```
 
 ### Action philosophy
-The different is subtle, but I prefer using the action classes for a few reasons.
+The difference is subtle, but I prefer using the action classes for a few reasons:
 
 1. The class name indicates the action being performed: `UploadFileAction` clearly indicates that we're uploading a file.
-2. Any pre or post-processing computation can be handled in the `act()` method rather than reimplementing it in each storage provider class.
+2. Any non-provider-specific pre or post-processing computation can be handled in the `act()` method rather than reimplementing it in each storage provider class.
 3. They can be mocked in tests easier. Because a concrete object is being injected, only the `act()` method needs to be mocked. Mocking (or creating an anonymous class of) an interface is more difficult and often overkill for a test that's only testing one codepath.
 
 ## Credits
