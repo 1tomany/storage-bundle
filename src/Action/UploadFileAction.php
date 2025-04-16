@@ -6,14 +6,14 @@ use OneToMany\StorageBundle\Record\RemoteFileRecord;
 use OneToMany\StorageBundle\Request\UploadFileRequest;
 use OneToMany\StorageBundle\Service\StorageServiceInterface;
 
-final readonly class UploadFileAction
+readonly class UploadFileAction
 {
-    public function __construct(private StorageServiceInterface $storage)
+    public function __construct(private StorageServiceInterface $storageService)
     {
     }
 
     public function act(UploadFileRequest $request): RemoteFileRecord
     {
-        return $this->storage->upload($request);
+        return $this->storageService->upload($request);
     }
 }
