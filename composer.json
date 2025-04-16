@@ -14,7 +14,6 @@
     "require": {
         "php": ">=8.4",
         "ext-fileinfo": "*",
-        "aws/aws-sdk-php-symfony": "^2.8",
         "psr/container": "^2.0",
         "psr/http-message": "^2.0",
         "symfony/dependency-injection": "^7.2",

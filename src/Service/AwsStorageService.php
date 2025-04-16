@@ -14,6 +14,7 @@ use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
+use function class_exists;
 use function function_exists;
 use function mime_content_type;
 use function sys_get_temp_dir;
@@ -24,11 +25,20 @@ final readonly class AwsStorageService implements StorageServiceInterface
 
     private Filesystem $filesystem;
 
+    /**
+     * @disregard P1009 Undefined type
+     */
     public function __construct(
+        // @phpstan-ignore-next-line
         private S3Client $s3Client,
         private string $bucket,
         private ?string $customUrl,
     ) {
+        /** @disregard P1009 Undefined type */
+        if (!class_exists(S3Client::class)) {
+            throw new \LogicException('You cannot use AWS because the AWS SDK is not installed. Try running "composer require aws/aws-sdk-php-symfony".');
+        }
+
         $this->filesystem = new Filesystem();
     }
 
@@ -43,6 +53,7 @@ final readonly class AwsStorageService implements StorageServiceInterface
                 'Key' => $request->remoteKey,
             ]);
 
+            // @phpstan-ignore-next-line
             $body = $file->get('Body');
 
             if (!$body instanceof StreamInterface) {
@@ -103,6 +114,7 @@ final readonly class AwsStorageService implements StorageServiceInterface
             ]);
 
             /** @var non-empty-string $canonicalUrl */
+            // @phpstan-ignore-next-line
             $canonicalUrl = $result->get('ObjectURL');
         } catch (\Exception $e) {
             throw new UploadingFileFailedException($e);
