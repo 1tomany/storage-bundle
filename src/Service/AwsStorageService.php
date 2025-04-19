@@ -13,11 +13,15 @@ use OneToMany\StorageBundle\Request\UploadFileRequest;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 use function class_exists;
+use function file_exists;
 use function function_exists;
 use function mime_content_type;
+use function sprintf;
 use function sys_get_temp_dir;
+use function trim;
 
 final readonly class AwsStorageService implements StorageServiceInterface
 {
@@ -60,23 +64,32 @@ final readonly class AwsStorageService implements StorageServiceInterface
                 throw new \RuntimeException('The contents of the file could not be streamed.');
             }
 
-            $filePath = $this->filesystem->tempnam(
-                sys_get_temp_dir(), '__1n__file_'
-            );
+            // Attempt to Resolve Extension
+            $extension = Path::getExtension(...[
+                'path' => $request->remoteKey,
+            ]);
+
+            if (!empty($extension = trim($extension))) {
+                $extension = sprintf('.%s', $extension);
+            }
+
+            $filePath = $this->filesystem->tempnam(sys_get_temp_dir(), DownloadFileRequest::PREFIX, $extension);
         } catch (\Exception $e) {
             throw new DownloadingFileFailedException($request->remoteKey, $e);
         }
 
         try {
-            $this->filesystem->dumpFile(
-                $filePath, $body->getContents()
-            );
+            $this->filesystem->dumpFile($filePath, $body->getContents());
         } catch (\Exception $e) {
             if ($this->filesystem->exists($filePath)) {
                 $this->filesystem->remove($filePath);
             }
 
             throw new DownloadingFileFailedException($request->remoteKey, $e);
+        }
+
+        if (!file_exists($filePath)) {
+            throw new DownloadingFileFailedException($request->remoteKey);
         }
 
         return new LocalFileRecord($filePath);
