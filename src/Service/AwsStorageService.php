@@ -16,6 +16,7 @@ use Symfony\Component\Filesystem\Path;
 
 use function class_exists;
 use function file_exists;
+use function is_readable;
 use function sprintf;
 use function sys_get_temp_dir;
 use function trim;
@@ -91,7 +92,7 @@ final readonly class AwsStorageService implements StorageServiceInterface
      */
     public function upload(UploadFileRequest $request): RemoteFileRecord
     {
-        if (!file_exists($request->file->filePath)) {
+        if (!file_exists($request->file) || !@is_readable($request->file)) {
             throw new LocalFileNotReadableForUploadException($request->file->filePath);
         }
 
