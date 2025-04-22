@@ -92,7 +92,7 @@ final readonly class AwsStorageService implements StorageServiceInterface
      */
     public function upload(UploadFileRequest $request): RemoteFileRecord
     {
-        if (!file_exists($request->file) || !@is_readable($request->file)) {
+        if (!file_exists($request->file) || !is_readable($request->file)) {
             throw new LocalFileNotReadableForUploadException($request->file->filePath);
         }
 
