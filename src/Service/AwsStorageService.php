@@ -4,6 +4,7 @@ namespace OneToMany\StorageBundle\Service;
 
 use Aws\S3\S3Client;
 use OneToMany\StorageBundle\Exception\DownloadingFileFailedException;
+use OneToMany\StorageBundle\Exception\LocalFileNotReadableForUploadException;
 use OneToMany\StorageBundle\Exception\UploadingFileFailedException;
 use OneToMany\StorageBundle\Record\LocalFileRecord;
 use OneToMany\StorageBundle\Record\RemoteFileRecord;
@@ -14,6 +15,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 use function class_exists;
+use function file_exists;
 use function sprintf;
 use function sys_get_temp_dir;
 use function trim;
@@ -89,6 +91,10 @@ final readonly class AwsStorageService implements StorageServiceInterface
      */
     public function upload(UploadFileRequest $request): RemoteFileRecord
     {
+        if (!file_exists($request->file->filePath)) {
+            throw new LocalFileNotReadableForUploadException($request->file->filePath);
+        }
+
         try {
             $acl = function (bool $isPublic): string {
                 return $isPublic ? 'public-read' : 'private';
