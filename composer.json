@@ -1,6 +1,6 @@
 {
     "name": "1tomany/storage-bundle",
-    "description": "Symfony bundle to manage remote storage services",
+    "description": "Symfony bundle to manage uploading and downloading files to and from remote storage services",
     "license": "MIT",
     "type": "symfony-bundle",
     "minimum-stability": "stable",
@@ -9,7 +9,10 @@
         "aws",
         "s3",
         "azure",
-        "blob"
+        "blob",
+        "files",
+        "storage",
+        "uploads"
     ],
     "require": {
         "php": ">=8.4",
@@ -25,6 +28,9 @@
         "friendsofphp/php-cs-fixer": "^3.75",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^11.5"
+    },
+    "suggest": {
+        "aws/aws-sdk-php-symfony": "Provides autowired AWS S3 client for S3 compatible storage services"
     },
     "autoload": {
         "psr-4": {
