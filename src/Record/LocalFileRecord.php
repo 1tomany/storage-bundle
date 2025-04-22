@@ -2,14 +2,21 @@
 
 namespace OneToMany\StorageBundle\Record;
 
+use OneToMany\DataUri\SmartFile;
+
+use function OneToMany\DataUri\parse_data;
+
 final readonly class LocalFileRecord implements \Stringable
 {
-    public function __construct(public string $filePath)
+    public SmartFile $file;
+
+    public function __construct(string $filePath)
     {
+        $this->file = parse_data($filePath);
     }
 
     public function __toString(): string
     {
-        return $this->filePath;
+        return $this->file->filePath;
     }
 }

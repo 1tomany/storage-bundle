@@ -8,6 +8,8 @@ use OneToMany\StorageBundle\Service\MockStorageService;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
+use function OneToMany\DataUri\parse_data;
+
 #[Group('UnitTests')]
 #[Group('ServiceTests')]
 final class MockStorageServiceTest extends TestCase
@@ -24,31 +26,31 @@ final class MockStorageServiceTest extends TestCase
 
     public function testUploadingFileWithoutCustomUrl(): void
     {
-        $bucket = 'mock-bucket';
-        $remoteKey = 'file.jpeg';
+        $file = parse_data(__DIR__.'/../data/php-logo.png');
 
-        $serviceUrl = 'https://mock-storage.service';
-        $objectUrl = $serviceUrl.'/'.$bucket.'/'.$remoteKey;
+        $bucket = 'mock-bucket';
+        $baseUrl = 'https://mock-storage.service';
+        $fileUrl = $baseUrl.'/'.$bucket.'/'.$file->remoteKey;
 
         $record = new MockStorageService($bucket, null)->upload(...[
-            'request' => UploadFileRequest::public($remoteKey, $remoteKey),
+            'request' => UploadFileRequest::public($file),
         ]);
 
-        $this->assertEquals($objectUrl, $record->url);
+        $this->assertEquals($fileUrl, $record->url);
     }
 
     public function testUploadingFileWithCustomUrl(): void
     {
+        $file = parse_data(__DIR__.'/../data/php-logo.png');
+
         $bucket = 'mock-bucket';
-        $remoteKey = 'file.jpeg';
+        $baseUrl = 'https://custom-cdn.com';
+        $fileUrl = $baseUrl.'/'.$file->remoteKey;
 
-        $customUrl = 'https://custom-cdn.com';
-        $objectUrl = $customUrl.'/'.$remoteKey;
-
-        $record = new MockStorageService($bucket, $customUrl)->upload(...[
-            'request' => UploadFileRequest::public($remoteKey, $remoteKey),
+        $record = new MockStorageService($bucket, $baseUrl)->upload(...[
+            'request' => UploadFileRequest::public($file),
         ]);
 
-        $this->assertEquals($objectUrl, $record->url);
+        $this->assertEquals($fileUrl, $record->url);
     }
 }

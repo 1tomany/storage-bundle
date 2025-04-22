@@ -4,21 +4,16 @@ namespace OneToMany\StorageBundle\Service;
 
 use Aws\S3\S3Client;
 use OneToMany\StorageBundle\Exception\DownloadingFileFailedException;
-use OneToMany\StorageBundle\Exception\LocalFileNotReadableException;
 use OneToMany\StorageBundle\Exception\UploadingFileFailedException;
 use OneToMany\StorageBundle\Record\LocalFileRecord;
 use OneToMany\StorageBundle\Record\RemoteFileRecord;
 use OneToMany\StorageBundle\Request\DownloadFileRequest;
 use OneToMany\StorageBundle\Request\UploadFileRequest;
 use Psr\Http\Message\StreamInterface;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 use function class_exists;
-use function file_exists;
-use function function_exists;
-use function mime_content_type;
 use function sprintf;
 use function sys_get_temp_dir;
 use function trim;
@@ -26,8 +21,6 @@ use function trim;
 final readonly class AwsStorageService implements StorageServiceInterface
 {
     use GenerateUrlTrait;
-
-    private Filesystem $filesystem;
 
     /**
      * @disregard P1009 Undefined type
@@ -42,8 +35,6 @@ final readonly class AwsStorageService implements StorageServiceInterface
         if (!class_exists(S3Client::class)) {
             throw new \LogicException('You cannot use AWS because the AWS SDK is not installed. Try running "composer require aws/aws-sdk-php-symfony".');
         }
-
-        $this->filesystem = new Filesystem();
     }
 
     /**
@@ -51,6 +42,8 @@ final readonly class AwsStorageService implements StorageServiceInterface
      */
     public function download(DownloadFileRequest $request): LocalFileRecord
     {
+        $filesystem = new Filesystem();
+
         try {
             $file = $this->s3Client->getObject([
                 'Bucket' => $this->bucket,
@@ -73,23 +66,19 @@ final readonly class AwsStorageService implements StorageServiceInterface
                 $extension = sprintf('.%s', $extension);
             }
 
-            $filePath = $this->filesystem->tempnam(sys_get_temp_dir(), DownloadFileRequest::PREFIX, $extension);
+            $filePath = $filesystem->tempnam(sys_get_temp_dir(), DownloadFileRequest::PREFIX, $extension);
         } catch (\Exception $e) {
             throw new DownloadingFileFailedException($request->remoteKey, $e);
         }
 
         try {
-            $this->filesystem->dumpFile($filePath, $body->getContents());
+            $filesystem->dumpFile($filePath, $body->getContents());
         } catch (\Exception $e) {
-            if ($this->filesystem->exists($filePath)) {
-                $this->filesystem->remove($filePath);
+            if ($filesystem->exists($filePath)) {
+                $filesystem->remove($filePath);
             }
 
             throw new DownloadingFileFailedException($request->remoteKey, $e);
-        }
-
-        if (!file_exists($filePath)) {
-            throw new DownloadingFileFailedException($request->remoteKey);
         }
 
         return new LocalFileRecord($filePath);
@@ -101,29 +90,16 @@ final readonly class AwsStorageService implements StorageServiceInterface
     public function upload(UploadFileRequest $request): RemoteFileRecord
     {
         try {
-            if (!$this->filesystem->exists($request->filePath)) {
-                throw new LocalFileNotReadableException($request->filePath);
-            }
-        } catch (IOExceptionInterface $e) {
-            throw new LocalFileNotReadableException($request->filePath, $e);
-        }
-
-        try {
-            $accessControl = $this->resolveAcl(...[
-                'isPublic' => $request->isPublic,
-            ]);
-
-            $contentType = $this->resolveContentType(...[
-                'filePath' => $request->filePath,
-                'contentType' => $request->contentType,
-            ]);
+            $acl = function (bool $isPublic): string {
+                return $isPublic ? 'public-read' : 'private';
+            };
 
             $result = $this->s3Client->putObject([
                 'Bucket' => $this->bucket,
-                'ACL' => $accessControl,
-                'Key' => $request->remoteKey,
-                'Content-Type' => $contentType,
-                'SourceFile' => $request->filePath,
+                'ACL' => $acl($request->isPublic),
+                'Key' => $request->file->remoteKey,
+                'Content-Type' => $request->file->mediaType,
+                'SourceFile' => $request->file->filePath,
             ]);
 
             /** @var non-empty-string $canonicalUrl */
@@ -136,29 +112,9 @@ final readonly class AwsStorageService implements StorageServiceInterface
         $objectUrl = $this->generateUrl(...[
             'canonicalUrl' => $canonicalUrl,
             'customUrl' => $this->customUrl,
-            'remoteKey' => $request->remoteKey,
+            'remoteKey' => $request->file->remoteKey,
         ]);
 
         return new RemoteFileRecord($objectUrl);
-    }
-
-    private function resolveAcl(bool $isPublic): string
-    {
-        return $isPublic ? 'public-read' : 'private';
-    }
-
-    private function resolveContentType(string $filePath, ?string $contentType): string
-    {
-        if (!empty($contentType)) {
-            return $contentType;
-        }
-
-        $contentType = null;
-
-        if (function_exists('mime_content_type')) {
-            $contentType = mime_content_type($filePath);
-        }
-
-        return $contentType ?: 'application/octet-stream';
     }
 }

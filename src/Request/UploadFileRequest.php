@@ -2,29 +2,23 @@
 
 namespace OneToMany\StorageBundle\Request;
 
+use OneToMany\DataUri\SmartFile;
+
 final readonly class UploadFileRequest
 {
     public function __construct(
-        public string $filePath,
-        public string $remoteKey,
-        public ?string $contentType = null,
+        public SmartFile $file,
         public bool $isPublic = true,
     ) {
     }
 
-    public static function public(
-        string $filePath,
-        string $remoteKey,
-        ?string $contentType = null,
-    ): self {
-        return new self($filePath, $remoteKey, $contentType, true);
+    public static function public(SmartFile $file): self
+    {
+        return new self($file, true);
     }
 
-    public static function private(
-        string $filePath,
-        string $remoteKey,
-        ?string $contentType = null,
-    ): self {
-        return new self($filePath, $remoteKey, $contentType, false);
+    public static function private(SmartFile $file): self
+    {
+        return new self($file, false);
     }
 }
