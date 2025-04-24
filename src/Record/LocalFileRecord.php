@@ -12,7 +12,7 @@ final readonly class LocalFileRecord implements \Stringable
 
     public function __construct(string $filePath)
     {
-        $this->file = parse_data($filePath);
+        $this->file = parse_data(data: $filePath, deleteOriginalFile: true);
     }
 
     public function __toString(): string
