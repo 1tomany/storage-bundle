@@ -7,18 +7,25 @@ use OneToMany\DataUri\SmartFile;
 final readonly class UploadFileRequest
 {
     public function __construct(
-        public SmartFile $file,
+        public string $filePath,
+        public string $mediaType,
+        public string $remoteKey,
         public bool $isPublic = true,
     ) {
     }
 
-    public static function public(SmartFile $file): self
+    public static function fromSmartFile(SmartFile $file, bool $isPublic = true): self
     {
-        return new self($file, true);
+        return new self($file->filePath, $file->mediaType, $file->remoteKey, $isPublic);
     }
 
-    public static function private(SmartFile $file): self
+    public static function public(string $filePath, string $mediaType, string $remoteKey): self
     {
-        return new self($file, false);
+        return new self($filePath, $mediaType, $remoteKey, true);
+    }
+
+    public static function private(string $filePath, string $mediaType, string $remoteKey): self
+    {
+        return new self($filePath, $mediaType, $remoteKey, false);
     }
 }

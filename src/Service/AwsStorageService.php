@@ -92,8 +92,8 @@ final readonly class AwsStorageService implements StorageServiceInterface
      */
     public function upload(UploadFileRequest $request): RemoteFileRecord
     {
-        if (!file_exists($request->file) || !is_readable($request->file)) {
-            throw new LocalFileNotReadableForUploadException($request->file->filePath);
+        if (!file_exists($request->filePath) || !is_readable($request->filePath)) {
+            throw new LocalFileNotReadableForUploadException($request->filePath);
         }
 
         try {
@@ -103,15 +103,14 @@ final readonly class AwsStorageService implements StorageServiceInterface
 
             $result = $this->s3Client->putObject([
                 'Bucket' => $this->bucket,
+                'Key' => $request->remoteKey,
                 'ACL' => $acl($request->isPublic),
-                'Key' => $request->file->remoteKey,
-                'Content-Type' => $request->file->mediaType,
-                'SourceFile' => $request->file->filePath,
+                'Content-Type' => $request->mediaType,
+                'SourceFile' => $request->filePath,
             ]);
 
             /** @var non-empty-string $canonicalUrl */
-            // @phpstan-ignore-next-line
-            $canonicalUrl = $result->get('ObjectURL');
+            $canonicalUrl = $result->get('ObjectURL'); // @phpstan-ignore-line
         } catch (\Exception $e) {
             throw new UploadingFileFailedException($e);
         }
@@ -119,7 +118,7 @@ final readonly class AwsStorageService implements StorageServiceInterface
         $objectUrl = $this->generateUrl(...[
             'canonicalUrl' => $canonicalUrl,
             'customUrl' => $this->customUrl,
-            'remoteKey' => $request->file->remoteKey,
+            'remoteKey' => $request->remoteKey,
         ]);
 
         return new RemoteFileRecord($objectUrl);

@@ -5,14 +5,12 @@ namespace OneToMany\StorageBundle\Tests\Service;
 use OneToMany\StorageBundle\Request\DownloadFileRequest;
 use OneToMany\StorageBundle\Request\UploadFileRequest;
 use OneToMany\StorageBundle\Service\MockStorageService;
+use OneToMany\StorageBundle\Tests\FileTestCase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
-
-use function OneToMany\DataUri\parse_data;
 
 #[Group('UnitTests')]
 #[Group('ServiceTests')]
-final class MockStorageServiceTest extends TestCase
+final class MockStorageServiceTest extends FileTestCase
 {
     public function testDownloadingFileIsNotImplemented(): void
     {
@@ -26,31 +24,34 @@ final class MockStorageServiceTest extends TestCase
 
     public function testUploadingFileWithoutCustomUrl(): void
     {
-        $file = parse_data(__DIR__.'/../data/php-logo.png');
-
         $bucket = 'mock-bucket';
-        $baseUrl = 'https://mock-storage.service';
-        $fileUrl = $baseUrl.'/'.$bucket.'/'.$file->remoteKey;
+        $fileUrl = 'https://mock-storage.service/'.$bucket.'/'.$this->key;
 
-        $record = new MockStorageService($bucket, null)->upload(...[
-            'request' => UploadFileRequest::public($file),
-        ]);
+        $record = $this->createStorageService($bucket, null)->upload(
+            new UploadFileRequest($this->path, $this->type, $this->key)
+        );
 
         $this->assertEquals($fileUrl, $record->url);
     }
 
     public function testUploadingFileWithCustomUrl(): void
     {
-        $file = parse_data(__DIR__.'/../data/php-logo.png');
-
         $bucket = 'mock-bucket';
         $baseUrl = 'https://custom-cdn.com';
-        $fileUrl = $baseUrl.'/'.$file->remoteKey;
+        $fileUrl = $baseUrl.'/'.$this->key;
 
-        $record = new MockStorageService($bucket, $baseUrl)->upload(...[
-            'request' => UploadFileRequest::public($file),
-        ]);
+        $record = $this->createStorageService($bucket, $baseUrl)->upload(
+            new UploadFileRequest($this->path, $this->type, $this->key)
+        );
 
         $this->assertEquals($fileUrl, $record->url);
+    }
+
+    private function createStorageService(
+        string $bucket,
+        ?string $baseUrl = null,
+    ): MockStorageService
+    {
+        return new MockStorageService($bucket, $baseUrl);
     }
 }

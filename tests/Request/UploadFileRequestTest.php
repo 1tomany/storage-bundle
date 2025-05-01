@@ -2,36 +2,32 @@
 
 namespace OneToMany\StorageBundle\Tests\Request;
 
-use OneToMany\DataUri\SmartFile;
 use OneToMany\StorageBundle\Request\UploadFileRequest;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-
-use function OneToMany\DataUri\parse_data;
 
 #[Group('UnitTests')]
 #[Group('RequestTests')]
 final class UploadFileRequestTest extends TestCase
 {
-    private SmartFile $file;
+    private string $path;
+    private string $type;
 
     protected function setUp(): void
     {
-        $this->file = parse_data(__DIR__.'/../data/php-logo.png');
-    }
+        $this->path = __DIR__.'/../data/php-logo.png';
 
-    protected function tearDown(): void
-    {
-        unset($this->file);
+        // @phpstan-ignore-next-line
+        $this->type = \mime_content_type($this->path);
     }
 
     public function testCreatingPublicRequestSetsAclAsPublic(): void
     {
-        $this->assertTrue(UploadFileRequest::public($this->file)->isPublic);
+        $this->assertTrue(UploadFileRequest::public($this->path, $this->type, $this->path)->isPublic);
     }
 
     public function testCreatingPrivateRequestSetsAclAsPublic(): void
     {
-        $this->assertFalse(UploadFileRequest::private($this->file)->isPublic);
+        $this->assertFalse(UploadFileRequest::private($this->path, $this->type, $this->path)->isPublic);
     }
 }
