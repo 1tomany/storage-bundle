@@ -14,8 +14,10 @@ final readonly class UploadFileRequest
     ) {
     }
 
+    // @phpstan-ignore-next-line
     public static function fromSmartFile(SmartFile $file, bool $isPublic = true): self
     {
+        // @phpstan-ignore-next-line
         return new self($file->filePath, $file->mediaType, $file->remoteKey, $isPublic);
     }
 

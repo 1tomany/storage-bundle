@@ -4,19 +4,25 @@ namespace OneToMany\StorageBundle\Record;
 
 use OneToMany\DataUri\SmartFile;
 
-use function OneToMany\DataUri\parse_data;
-
 final readonly class LocalFileRecord implements \Stringable
 {
-    public SmartFile $file;
-
-    public function __construct(string $filePath)
+    public function __construct(public string $filePath)
     {
-        $this->file = parse_data(data: $filePath, deleteOriginalFile: true);
     }
 
     public function __toString(): string
     {
-        return $this->file->filePath;
+        return $this->filePath;
+    }
+
+    // @phpstan-ignore-next-line
+    public function asSmartFile(): SmartFile
+    {
+        if (!\class_exists(SmartFile::class)) {
+            throw new \LogicException('The file can not be converted to a SmartFile because the Data URI library is not installed. Try running "composer require 1tomany/data-uri".');
+        }
+
+        // @phpstan-ignore-next-line
+        return \OneToMany\DataUri\parse_data(data: $this->filePath, deleteOriginalFile: true);
     }
 }
