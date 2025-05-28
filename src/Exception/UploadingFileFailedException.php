@@ -2,10 +2,10 @@
 
 namespace OneToMany\StorageBundle\Exception;
 
-final class UploadingFileFailedException extends \RuntimeException implements ExceptionInterface
+final class UploadingFileFailedException extends RuntimeException
 {
-    public function __construct(?\Throwable $previous = null, int $code = 0)
+    public function __construct(?\Throwable $previous = null)
     {
-        parent::__construct('An error occurred when attempting to upload the file.', $code, $previous);
+        parent::__construct('An error occurred when attempting to upload the file.', previous: $previous);
     }
 }
