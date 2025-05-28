@@ -50,8 +50,7 @@ final class MockStorageServiceTest extends FileTestCase
     private function createStorageService(
         string $bucket,
         ?string $baseUrl = null,
-    ): MockStorageService
-    {
+    ): MockStorageService {
         return new MockStorageService($bucket, $baseUrl);
     }
 }

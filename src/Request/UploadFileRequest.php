@@ -8,17 +8,15 @@ final readonly class UploadFileRequest
 {
     public function __construct(
         public string $filePath,
-        public string $mediaType,
+        public string $contentType,
         public string $remoteKey,
         public bool $isPublic = true,
     ) {
     }
 
-    // @phpstan-ignore-next-line
-    public static function fromSmartFile(SmartFile $file, bool $isPublic = true): self
+    public static function fromSmartFile(SmartFile $file, bool $isPublic = true): self // @phpstan-ignore-line
     {
-        // @phpstan-ignore-next-line
-        return new self($file->filePath, $file->mediaType, $file->remoteKey, $isPublic);
+        return new self($file->filePath, $file->contentType, $file->remoteKey, $isPublic); // @phpstan-ignore-line
     }
 
     public static function public(string $filePath, string $mediaType, string $remoteKey): self

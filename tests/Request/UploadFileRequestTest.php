@@ -6,6 +6,8 @@ use OneToMany\StorageBundle\Request\UploadFileRequest;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
+use function mime_content_type;
+
 #[Group('UnitTests')]
 #[Group('RequestTests')]
 final class UploadFileRequestTest extends TestCase
@@ -18,7 +20,7 @@ final class UploadFileRequestTest extends TestCase
         $this->path = __DIR__.'/../data/php-logo.png';
 
         // @phpstan-ignore-next-line
-        $this->type = \mime_content_type($this->path);
+        $this->type = mime_content_type($this->path);
     }
 
     public function testCreatingPublicRequestSetsAclAsPublic(): void

@@ -5,6 +5,7 @@ namespace OneToMany\StorageBundle\Service;
 use Aws\S3\S3Client;
 use OneToMany\StorageBundle\Exception\DownloadingFileFailedException;
 use OneToMany\StorageBundle\Exception\LocalFileNotReadableForUploadException;
+use OneToMany\StorageBundle\Exception\RuntimeException;
 use OneToMany\StorageBundle\Exception\UploadingFileFailedException;
 use OneToMany\StorageBundle\Record\LocalFileRecord;
 use OneToMany\StorageBundle\Record\RemoteFileRecord;
@@ -36,7 +37,7 @@ final readonly class AwsStorageService implements StorageServiceInterface
     ) {
         /** @disregard P1009 Undefined type */
         if (!class_exists(S3Client::class)) {
-            throw new \LogicException('You cannot use AWS because the AWS SDK is not installed. Try running "composer require aws/aws-sdk-php-symfony".');
+            throw new RuntimeException('This storage service can not be used because the AWS SDK is not installed. Try running "composer require aws/aws-sdk-php-symfony".');
         }
     }
 
@@ -105,7 +106,7 @@ final readonly class AwsStorageService implements StorageServiceInterface
                 'Bucket' => $this->bucket,
                 'Key' => $request->remoteKey,
                 'ACL' => $acl($request->isPublic),
-                'Content-Type' => $request->mediaType,
+                'Content-Type' => $request->contentType,
                 'SourceFile' => $request->filePath,
             ]);
 
