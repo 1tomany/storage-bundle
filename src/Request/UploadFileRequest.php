@@ -19,13 +19,13 @@ final readonly class UploadFileRequest
         return new self($file->filePath, $file->contentType, $file->remoteKey, $isPublic); // @phpstan-ignore-line
     }
 
-    public static function public(string $filePath, string $mediaType, string $remoteKey): self
+    public static function public(string $filePath, string $contentType, string $remoteKey): self
     {
-        return new self($filePath, $mediaType, $remoteKey, true);
+        return new self($filePath, $contentType, $remoteKey, true);
     }
 
-    public static function private(string $filePath, string $mediaType, string $remoteKey): self
+    public static function private(string $filePath, string $contentType, string $remoteKey): self
     {
-        return new self($filePath, $mediaType, $remoteKey, false);
+        return new self($filePath, $contentType, $remoteKey, false);
     }
 }
