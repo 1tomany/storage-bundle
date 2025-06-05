@@ -7,18 +7,15 @@ use function trim;
 
 trait GenerateUrlTrait
 {
-    private function generateUrl(
-        string $canonicalUrl,
-        ?string $customUrl,
-        string $remoteKey,
-    ): string {
+    private function generateUrl(string $url, ?string $customUrl, string $key): string
+    {
         // Ensure the custom URL is a slim as possible
         $customUrl = rtrim(trim($customUrl ?? ''), '/');
 
-        if (empty($customUrl)) {
-            return $canonicalUrl;
+        if (!$customUrl) {
+            return $url;
         }
 
-        return implode('/', [$customUrl, $remoteKey]);
+        return implode('/', [$customUrl, $key]);
     }
 }
