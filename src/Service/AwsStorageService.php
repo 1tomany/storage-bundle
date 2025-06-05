@@ -26,16 +26,12 @@ final readonly class AwsStorageService implements StorageServiceInterface
 {
     use GenerateUrlTrait;
 
-    /**
-     * @disregard P1009 Undefined type
-     */
     public function __construct(
         // @phpstan-ignore-next-line
         private S3Client $s3Client,
         private string $bucket,
         private ?string $customUrl,
     ) {
-        /** @disregard P1009 Undefined type */
         if (!class_exists(S3Client::class)) {
             throw new RuntimeException('This storage service can not be used because the AWS SDK is not installed. Try running "composer require aws/aws-sdk-php-symfony".');
         }
@@ -51,41 +47,40 @@ final readonly class AwsStorageService implements StorageServiceInterface
         try {
             $file = $this->s3Client->getObject([
                 'Bucket' => $this->bucket,
-                'Key' => $request->remoteKey,
+                'Key' => $request->key,
             ]);
 
-            // @phpstan-ignore-next-line
-            $body = $file->get('Body');
+            $body = $file->get('Body'); // @phpstan-ignore-line
 
             if (!$body instanceof StreamInterface) {
-                throw new \RuntimeException('The contents of the file could not be streamed.');
+                throw new \RuntimeException('Failed to stream the file contents.');
             }
 
             // Attempt to Resolve Extension
             $extension = Path::getExtension(...[
-                'path' => $request->remoteKey,
+                'path' => $request->key,
             ]);
 
             if (!empty($extension = trim($extension))) {
                 $extension = sprintf('.%s', $extension);
             }
 
-            $filePath = $filesystem->tempnam(sys_get_temp_dir(), DownloadFileRequest::PREFIX, $extension);
+            $path = $filesystem->tempnam(sys_get_temp_dir(), DownloadFileRequest::PREFIX, $extension);
         } catch (\Exception $e) {
-            throw new DownloadingFileFailedException($request->remoteKey, $e);
+            throw new DownloadingFileFailedException($request->key, $e);
         }
 
         try {
-            $filesystem->dumpFile($filePath, $body->getContents());
+            $filesystem->dumpFile($path, $body->getContents());
         } catch (\Exception $e) {
-            if ($filesystem->exists($filePath)) {
-                $filesystem->remove($filePath);
+            if ($filesystem->exists($path)) {
+                $filesystem->remove($path);
             }
 
-            throw new DownloadingFileFailedException($request->remoteKey, $e);
+            throw new DownloadingFileFailedException($request->key, $e);
         }
 
-        return new LocalFileRecord($filePath);
+        return new LocalFileRecord($path);
     }
 
     /**
@@ -93,8 +88,8 @@ final readonly class AwsStorageService implements StorageServiceInterface
      */
     public function upload(UploadFileRequest $request): RemoteFileRecord
     {
-        if (!file_exists($request->filePath) || !is_readable($request->filePath)) {
-            throw new LocalFileNotReadableForUploadException($request->filePath);
+        if (!file_exists($request->path) || !is_readable($request->path)) {
+            throw new LocalFileNotReadableForUploadException($request->path);
         }
 
         try {
@@ -104,24 +99,18 @@ final readonly class AwsStorageService implements StorageServiceInterface
 
             $result = $this->s3Client->putObject([
                 'Bucket' => $this->bucket,
-                'Key' => $request->remoteKey,
+                'Key' => $request->key,
+                'Content-Type' => $request->type,
+                'SourceFile' => $request->path,
                 'ACL' => $acl($request->isPublic),
-                'Content-Type' => $request->contentType,
-                'SourceFile' => $request->filePath,
             ]);
 
-            /** @var non-empty-string $canonicalUrl */
-            $canonicalUrl = $result->get('ObjectURL'); // @phpstan-ignore-line
+            /** @var non-empty-string $url */
+            $url = $result->get('ObjectURL'); // @phpstan-ignore-line
         } catch (\Exception $e) {
-            throw new UploadingFileFailedException($e);
+            throw new UploadingFileFailedException($request->key, $e);
         }
 
-        $objectUrl = $this->generateUrl(...[
-            'canonicalUrl' => $canonicalUrl,
-            'customUrl' => $this->customUrl,
-            'remoteKey' => $request->remoteKey,
-        ]);
-
-        return new RemoteFileRecord($objectUrl);
+        return new RemoteFileRecord($this->generateUrl($url, $this->customUrl, $request->key));
     }
 }

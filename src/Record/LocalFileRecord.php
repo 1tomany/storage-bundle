@@ -9,13 +9,13 @@ use function class_exists;
 
 final readonly class LocalFileRecord implements \Stringable
 {
-    public function __construct(public string $filePath)
+    public function __construct(public string $path)
     {
     }
 
     public function __toString(): string
     {
-        return $this->filePath;
+        return $this->path;
     }
 
     public function toSmartFile(): SmartFile // @phpstan-ignore-line
@@ -24,6 +24,6 @@ final readonly class LocalFileRecord implements \Stringable
             throw new RuntimeException('The file can not be converted to a SmartFile because the library is not installed. Try running "composer require 1tomany/data-uri".');
         }
 
-        return \OneToMany\DataUri\parse_data(data: $this->filePath, deleteOriginalFile: true); // @phpstan-ignore-line
+        return \OneToMany\DataUri\parse_data($this->path, cleanup: true); // @phpstan-ignore-line
     }
 }
