@@ -13,6 +13,7 @@ use OneToMany\StorageBundle\Exception\UploadingFileFailedException;
 use OneToMany\StorageBundle\Record\LocalFileRecord;
 use OneToMany\StorageBundle\Record\RemoteFileRecord;
 use OneToMany\StorageBundle\Request\UploadFileRequest;
+use OneToMany\StorageBundle\Response\DownloadedFileResponse;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Filesystem\Exception\ExceptionInterface as FilesystemExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -42,6 +43,9 @@ class S3StorageClient implements StorageClientInterface
         $this->filesystem = new Filesystem();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function download(DownloadFileRequestInterface $request): DownloadedFileResponseInterface
     {
         try {
@@ -62,11 +66,11 @@ class S3StorageClient implements StorageClientInterface
             // Resolve the extension for the temporary file
             $extension = Path::getExtension($request->getKey(), true);
 
-            if (!empty($extension)) {
+            if (false === empty($extension)) {
                 $extension = ".{$extension}";
             }
 
-            $temporaryFilePath = $this->filesystem->tempnam(sys_get_temp_dir(), DownloadFileRequestInterface::PREFIX, $extension);
+            $temporaryFilePath = $this->filesystem->tempnam($request->getDirectory(), $request::PREFIX, $extension);
         } catch (FilesystemExceptionInterface $e) {
             throw new RuntimeException(sprintf('Downloading the file "%s" failed because a temporary file could not be created on the filesystem.', $request->getKey()), previous: $e);
         }
@@ -81,7 +85,7 @@ class S3StorageClient implements StorageClientInterface
             throw new RuntimeException(sprintf('Downloading the file "%s" failed because the file contents could not be written to "%s".', $request->getKey(), $temporaryFilePath), previous: $e);
         }
 
-        return new LocalFileRecord($temporaryFilePath);
+        return new DownloadedFileResponse($temporaryFilePath);
     }
 
     /**
