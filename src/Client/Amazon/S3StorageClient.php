@@ -6,6 +6,7 @@ use Aws\S3\S3Client;
 use OneToMany\StorageBundle\Client\GenerateUrlTrait;
 use OneToMany\StorageBundle\Contract\Client\StorageClientInterface;
 use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
+use OneToMany\StorageBundle\Contract\Request\UploadFileRequestInterface;
 use OneToMany\StorageBundle\Contract\Response\DownloadedFileResponseInterface;
 use OneToMany\StorageBundle\Exception\InvalidArgumentException;
 use OneToMany\StorageBundle\Exception\LocalFileNotReadableForUploadException;
@@ -92,7 +93,7 @@ class S3StorageClient implements StorageClientInterface
     /**
      * @see OneToMany\StorageBundle\StorageServiceInterface
      */
-    public function upload(UploadFileRequest $request): RemoteFileRecord
+    public function upload(UploadFileRequestInterface $request): RemoteFileRecord
     {
         if (!file_exists($request->path) || !is_readable($request->path)) {
             throw new LocalFileNotReadableForUploadException($request->path);

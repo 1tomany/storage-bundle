@@ -107,7 +107,7 @@ class UploadFileRequest implements UploadFileRequestInterface
      */
     private function assertNotEmpty(?string $value, string $name): string
     {
-        if (empty($value = trim($value))) {
+        if (empty($value = trim($value ?? ''))) {
             throw new InvalidArgumentException(sprintf('The %s cannot be empty.', $name));
         }
 
