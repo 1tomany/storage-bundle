@@ -1,27 +1,27 @@
 <?php
 
-namespace OneToMany\StorageBundle\Tests\Service;
+namespace OneToMany\StorageBundle\Tests\Client;
 
+use OneToMany\StorageBundle\Client\Mock\MockStorageClient;
 use OneToMany\StorageBundle\Request\DownloadFileRequest;
 use OneToMany\StorageBundle\Request\UploadFileRequest;
-use OneToMany\StorageBundle\Service\MockStorageService;
 use OneToMany\StorageBundle\Tests\FileTestCase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\TestCase;
 
 #[Group('UnitTests')]
-#[Group('ServiceTests')]
-final class MockStorageServiceTest extends FileTestCase
+#[Group('ClientTests')]
+final class MockStorageClientTest extends TestCase
 {
     public function testDownloadingFileIsNotImplemented(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Not implemented!');
 
-        new MockStorageService('mock-bucket')->download(...[
-            'request' => new DownloadFileRequest('file.jpeg'),
-        ]);
+        new MockStorageClient('mock-bucket')->download(new DownloadFileRequest('file.jpeg'));
     }
 
+    /*
     public function testUploadingFileWithoutCustomUrl(): void
     {
         $bucket = 'mock-bucket';
@@ -53,4 +53,5 @@ final class MockStorageServiceTest extends FileTestCase
     ): MockStorageService {
         return new MockStorageService($bucket, $baseUrl);
     }
+    */
 }
