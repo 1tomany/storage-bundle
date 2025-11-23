@@ -3,6 +3,7 @@
 namespace OneToMany\StorageBundle\Client\Amazon;
 
 use Aws\S3\S3Client;
+use OneToMany\StorageBundle\Client\AbstractStorageClient;
 use OneToMany\StorageBundle\Client\GenerateUrlTrait;
 use OneToMany\StorageBundle\Contract\Client\StorageClientInterface;
 use OneToMany\StorageBundle\Contract\Request\DeleteFileRequestInterface;
@@ -27,37 +28,25 @@ use function file_exists;
 use function is_readable;
 use function is_writable;
 use function sprintf;
-use function trim;
 
-class S3StorageClient implements StorageClientInterface
+class S3StorageClient extends AbstractStorageClient
 {
-    use AssertNotEmptyTrait;
     use GenerateUrlTrait;
 
     private S3Client $s3Client; // @phpstan-ignore-line
-
-    /**
-     * @var non-empty-string
-     */
-    private string $bucket;
-
-    /**
-     * @var ?non-empty-string
-     */
-    private ?string $customUrl;
 
     public function __construct(
         S3Client $s3Client, // @phpstan-ignore-line
         string $bucket,
         ?string $customUrl,
     ) {
+        parent::__construct($bucket, $customUrl);
+
         if (!class_exists(S3Client::class)) {
             throw new RuntimeException('This storage client can not be used because the AWS SDK is not installed. Try running "composer require aws/aws-sdk-php-symfony".');
         }
 
         $this->s3Client = $s3Client;
-        $this->bucket = $this->assertNotEmpty($bucket, 'bucket');
-        $this->customUrl = trim($customUrl ?? '') ?: null;
     }
 
     public function getBucket(): string
