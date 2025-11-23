@@ -21,9 +21,6 @@ class DownloadedFileResponse implements DownloadedFileResponseInterface
         $this->path = $path;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPath(): string
     {
         return $this->path;

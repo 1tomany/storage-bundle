@@ -7,10 +7,10 @@ use OneToMany\StorageBundle\Client\GenerateUrlTrait;
 use OneToMany\StorageBundle\Contract\Client\StorageClientInterface;
 use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
 use OneToMany\StorageBundle\Contract\Response\DownloadedFileResponseInterface;
+use OneToMany\StorageBundle\Exception\InvalidArgumentException;
 use OneToMany\StorageBundle\Exception\LocalFileNotReadableForUploadException;
 use OneToMany\StorageBundle\Exception\RuntimeException;
 use OneToMany\StorageBundle\Exception\UploadingFileFailedException;
-use OneToMany\StorageBundle\Record\LocalFileRecord;
 use OneToMany\StorageBundle\Record\RemoteFileRecord;
 use OneToMany\StorageBundle\Request\UploadFileRequest;
 use OneToMany\StorageBundle\Response\DownloadedFileResponse;
@@ -22,8 +22,8 @@ use Symfony\Component\Filesystem\Path;
 use function class_exists;
 use function file_exists;
 use function is_readable;
+use function is_writable;
 use function sprintf;
-use function sys_get_temp_dir;
 
 class S3StorageClient implements StorageClientInterface
 {
@@ -43,11 +43,12 @@ class S3StorageClient implements StorageClientInterface
         $this->filesystem = new Filesystem();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function download(DownloadFileRequestInterface $request): DownloadedFileResponseInterface
     {
+        if (!is_writable($request->getDirectory())) {
+            throw new InvalidArgumentException(sprintf('Downloading the file "%s" failed because the directory "%s" is not writable.', $request->getKey(), $request->getDirectory()));
+        }
+
         try {
             $file = $this->s3Client->getObject([
                 'Bucket' => $this->bucket,

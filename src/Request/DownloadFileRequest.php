@@ -26,17 +26,14 @@ class DownloadFileRequest implements DownloadFileRequestInterface
         $this->key = $key;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDirectory(): string
     {
-        return ($this->directory ?: sys_get_temp_dir()) ?: '/tmp';
+        /** @var non-empty-string $directory */
+        $directory = $this->directory ?: sys_get_temp_dir();
+
+        return $directory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setDirectory(?string $directory): static
     {
         $this->directory = trim($directory ?? '') ?: null;
@@ -44,9 +41,6 @@ class DownloadFileRequest implements DownloadFileRequestInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getKey(): string
     {
         return $this->key;

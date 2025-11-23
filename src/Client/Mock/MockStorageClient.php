@@ -20,17 +20,11 @@ class MockStorageClient implements StorageClientInterface
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function download(DownloadFileRequestInterface $request): DownloadedFileResponseInterface
     {
         throw new RuntimeException('Not implemented!');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function upload(UploadFileRequest $request): RemoteFileRecord
     {
         $url = vsprintf('https://mock-storage.service/%s/%s', [
