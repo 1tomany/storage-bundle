@@ -8,6 +8,7 @@ use OneToMany\StorageBundle\Factory\StorageClientFactory;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 #[Group('UnitTests')]
 #[Group('FactoryTests')]
@@ -16,16 +17,18 @@ final class StorageClientFactoryTest extends TestCase
     public function testCreatingServiceRequiresServiceToExist(): void
     {
         $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The storage service "invalid" is not registered with the container.');
 
         new StorageClientFactory($this->createContainer())->create('invalid');
     }
 
-    // public function testCreatingServiceRequiresServiceToImplementRasterServiceInterface(): void
-    // {
-    //     $this->expectException(CreatingExtractorClientFailedServiceNotFoundException::class);
+    public function testCreatingServiceRequiresServiceToImplementStorageClientInterface(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The storage client "error" does not implement "OneToMany\StorageBundle\Contract\Client\StorageClientInterface".');
 
-    //     new ExtractorClientFactory($this->createContainer())->create('error');
-    // }
+        new StorageClientFactory($this->createContainer())->create('error');
+    }
 
     private function createContainer(): ContainerInterface
     {
@@ -48,6 +51,10 @@ final class StorageClientFactoryTest extends TestCase
 
             public function get(string $id): mixed
             {
+                if ('invalid' === $id) {
+                    throw new class('no good') extends \InvalidArgumentException implements NotFoundExceptionInterface {};
+                }
+
                 return $this->services[$id] ?? null;
             }
 
