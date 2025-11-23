@@ -10,6 +10,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
+use function sprintf;
+
 #[Group('UnitTests')]
 #[Group('FactoryTests')]
 final class StorageClientFactoryTest extends TestCase
@@ -36,7 +38,7 @@ final class StorageClientFactoryTest extends TestCase
             /**
              * @var array{
              *   mock: MockStorageClient,
-             *   error: \InvalidArgumentException,
+             *   error: InvalidArgumentException,
              * }
              */
             private array $services;
@@ -44,15 +46,15 @@ final class StorageClientFactoryTest extends TestCase
             public function __construct()
             {
                 $this->services = [
-                    'mock' => new MockStorageClient('bucket'),
-                    'error' => new \InvalidArgumentException(),
+                    'mock' => new MockStorageClient('mock-bucket'),
+                    'error' => new InvalidArgumentException('Error!'),
                 ];
             }
 
             public function get(string $id): mixed
             {
-                if ('invalid' === $id) {
-                    throw new class('no good') extends \InvalidArgumentException implements NotFoundExceptionInterface {};
+                if (!$this->has($id)) {
+                    throw new class(sprintf('The service "%s" is not registered with this container.', $id)) extends \InvalidArgumentException implements NotFoundExceptionInterface {};
                 }
 
                 return $this->services[$id] ?? null;
