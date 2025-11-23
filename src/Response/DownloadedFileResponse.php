@@ -3,12 +3,12 @@
 namespace OneToMany\StorageBundle\Response;
 
 use OneToMany\StorageBundle\Contract\Response\DownloadedFileResponseInterface;
-use OneToMany\StorageBundle\Exception\InvalidArgumentException;
-
-use function trim;
+use OneToMany\StorageBundle\Trait\AssertNotEmptyTrait;
 
 class DownloadedFileResponse implements DownloadedFileResponseInterface
 {
+    use AssertNotEmptyTrait;
+
     /**
      * @var non-empty-string
      */
@@ -16,11 +16,7 @@ class DownloadedFileResponse implements DownloadedFileResponseInterface
 
     public function __construct(string $path)
     {
-        if (empty($path = trim($path))) {
-            throw new InvalidArgumentException('The path cannot be empty.');
-        }
-
-        $this->path = $path;
+        $this->path = $this->assertNotEmpty($path, 'path');
     }
 
     public function getPath(): string

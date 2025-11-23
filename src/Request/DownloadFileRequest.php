@@ -3,46 +3,54 @@
 namespace OneToMany\StorageBundle\Request;
 
 use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
-use OneToMany\StorageBundle\Exception\InvalidArgumentException;
+use OneToMany\StorageBundle\Trait\AssertNotEmptyTrait;
 
+use function is_dir;
+use function is_writable;
 use function sys_get_temp_dir;
 use function trim;
 
 class DownloadFileRequest implements DownloadFileRequestInterface
 {
-    private ?string $directory = null;
+    use AssertNotEmptyTrait;
 
     /**
      * @var non-empty-string
      */
-    private string $key;
+    private readonly string $key;
 
-    public function __construct(string $key)
+    /**
+     * @var non-empty-string
+     */
+    private string $directory;
+
+    public function __construct(string $key, ?string $directory = null)
     {
-        if (empty($key = trim($key))) {
-            throw new InvalidArgumentException('The key cannot be empty.');
-        }
+        $this->key = $this->assertNotEmpty($key, 'key');
 
-        $this->key = $key;
-    }
-
-    public function getDirectory(): string
-    {
-        /** @var non-empty-string $directory */
-        $directory = $this->directory ?: sys_get_temp_dir();
-
-        return $directory;
-    }
-
-    public function setDirectory(?string $directory): static
-    {
-        $this->directory = trim($directory ?? '') ?: null;
-
-        return $this;
+        $this->setDirectory($directory);
     }
 
     public function getKey(): string
     {
         return $this->key;
+    }
+
+    public function getDirectory(): string
+    {
+        return $this->directory;
+    }
+
+    public function setDirectory(?string $directory): static
+    {
+        $directory = trim($directory ?? '');
+
+        if (!is_dir($directory) || !is_writable($directory)) {
+            $directory = sys_get_temp_dir();
+        }
+
+        $this->directory = $this->assertNotEmpty($directory, 'directory');
+
+        return $this;
     }
 }

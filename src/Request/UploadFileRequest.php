@@ -3,14 +3,14 @@
 namespace OneToMany\StorageBundle\Request;
 
 use OneToMany\StorageBundle\Contract\Request\UploadFileRequestInterface;
-use OneToMany\StorageBundle\Exception\InvalidArgumentException;
+use OneToMany\StorageBundle\Trait\AssertNotEmptyTrait;
 
-use function sprintf;
 use function strtolower;
-use function trim;
 
 class UploadFileRequest implements UploadFileRequestInterface
 {
+    use AssertNotEmptyTrait;
+
     /**
      * @var non-empty-string
      */
@@ -100,17 +100,5 @@ class UploadFileRequest implements UploadFileRequestInterface
         $this->isPublic = false;
 
         return $this;
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    private function assertNotEmpty(?string $value, string $name): string
-    {
-        if (empty($value = trim($value ?? ''))) {
-            throw new InvalidArgumentException(sprintf('The %s cannot be empty.', $name));
-        }
-
-        return $value;
     }
 }

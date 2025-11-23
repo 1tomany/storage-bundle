@@ -1,5 +1,5 @@
 # Storage Bundle for Symfony
-This bundle makes it easy to upload files to remote storage services like Amazon S3, Cloudflare R2, Google Cloud Storage, and Azure Blob Storage. Additionally, it provides a mock storage service to easily test your integrations without requiring a network connection.
+This bundle makes it easy to upload files to remote storage services like Amazon S3, Cloudflare R2, Google Cloud Storage, and Azure Blob Storage. Additionally, it provides a mock storage client to easily test your integrations without requiring a network connection.
 
 ## Installation
 Install the bundle using Composer:
@@ -23,7 +23,7 @@ This bundle does not have a Symfony Flex recipe yet, so you'll have to manually 
 ###> 1tomany/storage-bundle ###
 STORAGE_SERVICE="s3"
 STORAGE_BUCKET="my-bucket-name"
-STORAGE_CUSTOM_URL=
+STORAGE_CUSTOM_URL="https://my-custom-cdn.com"
 ###< 1tomany/storage-bundle ###
 ```
 
@@ -38,20 +38,22 @@ STORAGE_SERVICE="mock"
 #### `STORAGE_SERVICE`
 The storage provider to use. Possible values are:
 
-- `s3` Amazon S3 compatible service
-- `mock` A mock service for testing
+- `s3` Amazon S3 compatible client
+- `mock` A mock client for testing
+
+These values correspond to the `key` for each service with the tag `1tomany.storage_client`. You can add your own client by implementing the `StorageClientInterface` and tagging it with the tag `1tomany.storage_client` and a `key` value other than the ones above. 
 
 #### `STORAGE_BUCKET`
 The bucket where files will be uploaded.
 
 #### `STORAGE_CUSTOM_URL`
-The URL to use to reference the uploaded file instead of the canonical URL returned by the provider. Set this value if you use Amazon CloudFront or a public Cloudflare R2 bucket domain to get a publicly accessible file URL:
+The URL used to reference the uploaded file instead of the canonical URL returned by the storage service. Set this value if you use Amazon CloudFront or a public Cloudflare R2 bucket domain to get a publicly accessible file URL:
 
 ```env
 STORAGE_CUSTOM_URL="https://my-files.my-custom-cdn.com"
 ```
 
-When set, if an object named `users/10/files/avatar.png` was uploaded, the following URL would be returned:
+When set, if an object with the key `users/10/files/avatar.png` was uploaded, the following URL would be returned:
 
 ```
 https://my-files.my-custom-cdn.com/users/10/files/avatar.png
@@ -97,7 +99,7 @@ aws:
 ```
 
 ## Using actions
-This bundle registers a factory in the the Symfony container that will create a storage client provider service object. Each storage provider service class implements a common interface: `OneToMany\StorageBundle\Contract\Client\StorageClientInterface`. When a variable of this type is injected, the Symfony container will create the concrete storage provider service object defined by the `STORAGE_SERVICE` environment variable.
+This bundle registers a factory in the the Symfony container that will create a storage client object. Each storage client class implements a common interface: `OneToMany\StorageBundle\Contract\Client\StorageClientInterface`. When an object of this type is injected into a class, the Symfony container will create the concrete storage provider service object defined by the `STORAGE_SERVICE` environment variable.
 
 ```php
 <?php
@@ -122,8 +124,9 @@ final readonly class UploadFileHandler
 }
 ```
 
-However, I **do not** recommend using an instance of the `StorageClientInterface` interface directly. Instead, you should use an action class. There are two action interfaces:
+However, I **do not** recommend using an instance of the `StorageClientInterface` interface directly. Instead, you should use an action class. There are three action interfaces:
 
+- `OneToMany\StorageBundle\Contract\Action\DeleteFileActionInterface`
 - `OneToMany\StorageBundle\Contract\Action\DownloadFileActionInterface`
 - `OneToMany\StorageBundle\Contract\Action\UploadFileActionInterface`
 
