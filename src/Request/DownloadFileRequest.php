@@ -2,11 +2,16 @@
 
 namespace OneToMany\StorageBundle\Request;
 
-final readonly class DownloadFileRequest
-{
-    public const string PREFIX = '__1n__file_';
+use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
 
-    public function __construct(public string $key)
+class DownloadFileRequest implements DownloadFileRequestInterface
+{
+    public function __construct(private string $remoteKey)
     {
+    }
+
+    public function getRemoteKey(): string
+    {
+        return $this->remoteKey;
     }
 }
