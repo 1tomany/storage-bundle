@@ -45,10 +45,7 @@ class DownloadFileRequest implements DownloadFileRequestInterface
     {
         $directory = trim($directory ?? '');
 
-        if (
-            !is_dir($directory)
-            || !is_writable($directory)
-        ) {
+        if (!is_dir($directory) || !is_writable($directory)) {
             $directory = sys_get_temp_dir();
         }
 
