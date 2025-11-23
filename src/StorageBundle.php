@@ -13,6 +13,6 @@ class StorageBundle extends AbstractBundle
      */
     public function loadExtension(array $config, ContainerConfigurator $configurator, ContainerBuilder $container): void
     {
-        $configurator->import('../config/services.xml');
+        $configurator->import('../config/services.yaml');
     }
 }

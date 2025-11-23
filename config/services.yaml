@@ -1,0 +1,43 @@
+parameters:
+    env(STORAGE_BUCKET): 'CHANGE_ME'
+    env(STORAGE_SERVICE): 's3'
+    env(STORAGE_CUSTOM_URL): null
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    OneToMany\StorageBundle\:
+        resource: '../src/'
+
+    # Storage Clients
+    OneToMany\StorageBundle\Client\Amazon\S3StorageClient:
+        arguments:
+            $bucket: '%env(STORAGE_BUCKET)%'
+            $customUrl: '%env(STORAGE_CUSTOM_URL)%'
+        tags:
+            - { name: 1tomany.storage_client, key: s3 }
+
+    OneToMany\StorageBundle\Client\Mock\MockStorageClient:
+        arguments:
+            $bucket: '%env(STORAGE_BUCKET)%'
+            $customUrl: '%env(STORAGE_CUSTOM_URL)%'
+        tags:
+            - { name: 1tomany.storage_client, key: mock }
+
+    OneToMany\StorageBundle\Contract\Client\StorageClientInterface:
+        factory: ['@OneToMany\StorageBundle\Factory\StorageClientFactory', 'create']
+        arguments:
+            $paymentClient: '%env(STORAGE_SERVICE)%'
+
+    OneToMany\StorageBundle\Factory\StorageClientFactory:
+        arguments:
+            $container: !tagged_locator { tag: 1tomany.storage_client, index_by: key }
+
+    # Actions
+    # OneToMany\StorageBundle\Contract\Action\DownloadFileActionInterface:
+    #     alias: OneToMany\StorageBundle\Action\DownloadFileAction
+
+    # OneToMany\StorageBundle\Contract\Action\UploadFileActionInterface:
+    #     alias: OneToMany\StorageBundle\Action\UploadFileAction
