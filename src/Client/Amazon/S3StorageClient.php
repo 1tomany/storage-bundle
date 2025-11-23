@@ -13,7 +13,6 @@ use OneToMany\StorageBundle\Exception\LocalFileNotReadableForUploadException;
 use OneToMany\StorageBundle\Exception\RuntimeException;
 use OneToMany\StorageBundle\Exception\UploadingFileFailedException;
 use OneToMany\StorageBundle\Record\RemoteFileRecord;
-use OneToMany\StorageBundle\Request\UploadFileRequest;
 use OneToMany\StorageBundle\Response\DownloadedFileResponse;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Filesystem\Exception\ExceptionInterface as FilesystemExceptionInterface;

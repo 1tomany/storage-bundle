@@ -5,6 +5,8 @@ namespace OneToMany\StorageBundle\Response;
 use OneToMany\StorageBundle\Contract\Response\UploadedFileResponseInterface;
 use OneToMany\StorageBundle\Exception\InvalidArgumentException;
 
+use function trim;
+
 class UploadedFileResponse implements UploadedFileResponseInterface
 {
     /**
@@ -14,7 +16,7 @@ class UploadedFileResponse implements UploadedFileResponseInterface
 
     public function __construct(string $url)
     {
-        if (empty($url = \trim($url))) {
+        if (empty($url = trim($url))) {
             throw new InvalidArgumentException('The URL cannot be empty.');
         }
 
