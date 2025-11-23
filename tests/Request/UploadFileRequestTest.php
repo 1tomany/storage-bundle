@@ -19,4 +19,14 @@ final class UploadFileRequestTest extends TestCase
     {
         $this->assertFalse(UploadFileRequest::private('php-logo.png', 'image/png', 'php-logo.png')->isPublic());
     }
+
+    public function testMarkingAsPublic(): void
+    {
+        $this->assertTrue(new UploadFileRequest('file.jpeg', 'image/jpeg', 'file.jpeg')->markAsPublic()->isPublic());
+    }
+
+    public function testMarkingAsPrivate(): void
+    {
+        $this->assertFalse(new UploadFileRequest('file.jpeg', 'image/jpeg', 'file.jpeg')->markAsPrivate()->isPublic());
+    }
 }
