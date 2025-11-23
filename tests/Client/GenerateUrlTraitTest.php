@@ -19,6 +19,9 @@ final class GenerateUrlTraitTest extends TestCase
         $this->assertEquals($canonicalUrl, $this->generateUrl($canonicalUrl, $customUrl, $key));
     }
 
+    /**
+     * @return list<list<?non-empty-string>>
+     */
     public static function providerKeyCustomUrlAndCanonicalUrl(): array
     {
         $provider = [
