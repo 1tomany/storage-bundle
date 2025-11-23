@@ -2,6 +2,6 @@
 
 namespace OneToMany\StorageBundle\Contract\Response;
 
-interface DownloadFileResponseInterface
+interface DownloadedFileResponseInterface
 {
 }
