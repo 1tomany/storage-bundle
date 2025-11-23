@@ -23,7 +23,6 @@ final readonly class StorageClientFactory
             }
         } catch (ContainerExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('The storage service "%s" is not registered with the container.', $service), previous: $e);
-
         }
 
         return $storageClient;
