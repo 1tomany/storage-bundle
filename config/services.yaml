@@ -29,7 +29,7 @@ services:
     OneToMany\StorageBundle\Contract\Client\StorageClientInterface:
         factory: ['@OneToMany\StorageBundle\Factory\StorageClientFactory', 'create']
         arguments:
-            $paymentClient: '%env(STORAGE_SERVICE)%'
+            $storageService: '%env(STORAGE_SERVICE)%'
 
     OneToMany\StorageBundle\Factory\StorageClientFactory:
         arguments:

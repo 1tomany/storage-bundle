@@ -13,16 +13,16 @@ final readonly class StorageClientFactory
     {
     }
 
-    public function create(string $service): StorageClientInterface
+    public function create(string $storageService): StorageClientInterface
     {
         try {
-            $storageClient = $this->container->get($service);
+            $storageClient = $this->container->get($storageService);
 
             if (!$storageClient instanceof StorageClientInterface) {
-                throw new InvalidArgumentException(sprintf('The storage client "%s" does not implement "%s".', $service, StorageClientInterface::class));
+                throw new InvalidArgumentException(sprintf('The storage client "%s" does not implement "%s".', $storageService, StorageClientInterface::class));
             }
         } catch (ContainerExceptionInterface $e) {
-            throw new InvalidArgumentException(sprintf('The storage service "%s" is not registered with the container.', $service), previous: $e);
+            throw new InvalidArgumentException(sprintf('The storage service "%s" is not registered with the container.', $storageService), previous: $e);
         }
 
         return $storageClient;
