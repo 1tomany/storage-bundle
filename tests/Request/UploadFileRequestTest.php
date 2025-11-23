@@ -7,6 +7,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Path;
 
+use function basename;
 use function mime_content_type;
 
 #[Group('UnitTests')]
@@ -22,11 +23,11 @@ final class UploadFileRequestTest extends TestCase
 
     public function testCreatingPublicRequestSetsAclAsPublic(): void
     {
-        $this->assertTrue(UploadFileRequest::public($this->path, (string) mime_content_type($this->path), $this->path)->isPublic());
+        $this->assertTrue(UploadFileRequest::public($this->path, (string) mime_content_type($this->path), basename($this->path))->isPublic());
     }
 
     public function testCreatingPrivateRequestSetsAclAsPublic(): void
     {
-        $this->assertFalse(UploadFileRequest::private($this->path, (string) mime_content_type($this->path), $this->path)->isPublic());
+        $this->assertFalse(UploadFileRequest::private($this->path, (string) mime_content_type($this->path), basename($this->path))->isPublic());
     }
 }
