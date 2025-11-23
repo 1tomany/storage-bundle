@@ -16,18 +16,23 @@ class DownloadFileRequest implements DownloadFileRequestInterface
     /**
      * @var non-empty-string
      */
-    private string $directory;
+    private string $key;
 
     /**
      * @var non-empty-string
      */
-    private string $key;
+    private string $directory;
 
     public function __construct(string $key, ?string $directory = null)
     {
         $this->key = $this->assertNotEmpty($key, 'key');
 
         $this->setDirectory($directory);
+    }
+
+    public function getKey(): string
+    {
+        return $this->key;
     }
 
     public function getDirectory(): string
@@ -49,10 +54,5 @@ class DownloadFileRequest implements DownloadFileRequestInterface
         $this->directory = $this->assertNotEmpty($directory, 'directory');
 
         return $this;
-    }
-
-    public function getKey(): string
-    {
-        return $this->key;
     }
 }
