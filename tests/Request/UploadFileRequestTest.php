@@ -10,10 +10,6 @@ use PHPUnit\Framework\TestCase;
 #[Group('RequestTests')]
 final class UploadFileRequestTest extends TestCase
 {
-    protected function setUp(): void
-    {
-    }
-
     public function testCreatingPublicRequestSetsAclAsPublic(): void
     {
         $this->assertTrue(UploadFileRequest::public('php-logo.png', 'image/png', 'php-logo.png')->isPublic());
