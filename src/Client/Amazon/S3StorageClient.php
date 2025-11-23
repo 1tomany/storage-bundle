@@ -1,17 +1,20 @@
 <?php
 
-namespace OneToMany\StorageBundle\Service;
+namespace OneToMany\StorageBundle\Client\Amazon;
 
 use Aws\S3\S3Client;
-use OneToMany\StorageBundle\Client\Exception\DownloadingFileFailedException;
+use OneToMany\StorageBundle\Client\GenerateUrlTrait;
+use OneToMany\StorageBundle\Contract\Client\StorageClientInterface;
+use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
+use OneToMany\StorageBundle\Contract\Response\DownloadedFileResponseInterface;
 use OneToMany\StorageBundle\Exception\LocalFileNotReadableForUploadException;
 use OneToMany\StorageBundle\Exception\RuntimeException;
 use OneToMany\StorageBundle\Exception\UploadingFileFailedException;
 use OneToMany\StorageBundle\Record\LocalFileRecord;
 use OneToMany\StorageBundle\Record\RemoteFileRecord;
-use OneToMany\StorageBundle\Request\DownloadFileRequest;
 use OneToMany\StorageBundle\Request\UploadFileRequest;
 use Psr\Http\Message\StreamInterface;
+use Symfony\Component\Filesystem\Exception\ExceptionInterface as FilesystemExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
@@ -20,67 +23,65 @@ use function file_exists;
 use function is_readable;
 use function sprintf;
 use function sys_get_temp_dir;
-use function trim;
 
-final readonly class AwsStorageService implements StorageServiceInterface
+class S3StorageClient implements StorageClientInterface
 {
     use GenerateUrlTrait;
 
+    private Filesystem $filesystem;
+
     public function __construct(
-        // @phpstan-ignore-next-line
-        private S3Client $s3Client,
+        private S3Client $s3Client, // @phpstan-ignore-line
         private string $bucket,
         private ?string $customUrl,
     ) {
         if (!class_exists(S3Client::class)) {
             throw new RuntimeException('This storage service can not be used because the AWS SDK is not installed. Try running "composer require aws/aws-sdk-php-symfony".');
         }
+
+        $this->filesystem = new Filesystem();
     }
 
-    /**
-     * @see OneToMany\StorageBundle\StorageServiceInterface
-     */
-    public function download(DownloadFileRequest $request): LocalFileRecord
+    public function download(DownloadFileRequestInterface $request): DownloadedFileResponseInterface
     {
-        $filesystem = new Filesystem();
-
         try {
             $file = $this->s3Client->getObject([
                 'Bucket' => $this->bucket,
-                'Key' => $request->key,
+                'Key' => $request->getKey(),
             ]);
 
             $body = $file->get('Body'); // @phpstan-ignore-line
 
             if (!$body instanceof StreamInterface) {
-                throw new \RuntimeException('Failed to stream the file contents.');
+                throw new RuntimeException(sprintf('Downloading the file "%s" failed because the remote server failed to stream the contents.', $request->getKey()));
             }
-
-            // Attempt to Resolve Extension
-            $extension = Path::getExtension(...[
-                'path' => $request->key,
-            ]);
-
-            if (!empty($extension = trim($extension))) {
-                $extension = sprintf('.%s', $extension);
-            }
-
-            $path = $filesystem->tempnam(sys_get_temp_dir(), DownloadFileRequest::PREFIX, $extension);
         } catch (\Exception $e) {
-            throw new DownloadingFileFailedException($request->key, $e);
         }
 
         try {
-            $filesystem->dumpFile($path, $body->getContents());
-        } catch (\Exception $e) {
-            if ($filesystem->exists($path)) {
-                $filesystem->remove($path);
+            // Resolve the extension for the temporary file
+            $extension = Path::getExtension($request->getKey(), true);
+
+            if (!empty($extension)) {
+                $extension = ".{$extension}";
             }
 
-            throw new DownloadingFileFailedException($request->key, $e);
+            $temporaryFilePath = $this->filesystem->tempnam(sys_get_temp_dir(), DownloadFileRequestInterface::PREFIX, $extension);
+        } catch (FilesystemExceptionInterface $e) {
+            throw new RuntimeException(sprintf('Downloading the file "%s" failed because a temporary file could not be created on the filesystem.', $request->getKey()), previous: $e);
         }
 
-        return new LocalFileRecord($path);
+        try {
+            $this->filesystem->dumpFile($temporaryFilePath, $body->getContents());
+        } catch (FilesystemExceptionInterface $e) {
+            if ($this->filesystem->exists($temporaryFilePath)) {
+                $this->filesystem->remove($temporaryFilePath);
+            }
+
+            throw new RuntimeException(sprintf('Downloading the file "%s" failed because the file contents could not be written to "%s".', $request->getKey(), $temporaryFilePath), previous: $e);
+        }
+
+        return new LocalFileRecord($temporaryFilePath);
     }
 
     /**

@@ -3,15 +3,43 @@
 namespace OneToMany\StorageBundle\Request;
 
 use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
+use OneToMany\StorageBundle\Exception\InvalidArgumentException;
+
+use function sys_get_temp_dir;
+use function trim;
 
 class DownloadFileRequest implements DownloadFileRequestInterface
 {
-    public function __construct(private string $remoteKey)
+    private ?string $directory = null;
+
+    /**
+     * @var non-empty-string
+     */
+    private string $key;
+
+    public function __construct(string $key)
     {
+        if (empty($key = trim($key))) {
+            throw new InvalidArgumentException('The key cannot be an empty string.');
+        }
+
+        $this->key = $key;
     }
 
-    public function getRemoteKey(): string
+    public function getDirectory(): string
     {
-        return $this->remoteKey;
+        return ($this->directory ?: sys_get_temp_dir()) ?: '/tmp';
+    }
+
+    public function setDirectory(?string $directory): static
+    {
+        $this->directory = trim($directory ?? '') ?: null;
+
+        return $this;
+    }
+
+    public function getKey(): string
+    {
+        return $this->key;
     }
 }

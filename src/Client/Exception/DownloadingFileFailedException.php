@@ -1,6 +1,8 @@
 <?php
 
-namespace OneToMany\StorageBundle\Exception;
+namespace OneToMany\StorageBundle\Client\Exception;
+
+use OneToMany\StorageBundle\Exception\RuntimeException;
 
 use function sprintf;
 
