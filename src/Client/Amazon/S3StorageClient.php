@@ -36,7 +36,7 @@ class S3StorageClient implements StorageClientInterface
         private ?string $customUrl,
     ) {
         if (!class_exists(S3Client::class)) {
-            throw new RuntimeException('This storage service can not be used because the AWS SDK is not installed. Try running "composer require aws/aws-sdk-php-symfony".');
+            throw new RuntimeException('This storage client can not be used because the AWS SDK is not installed. Try running "composer require aws/aws-sdk-php-symfony".');
         }
 
         $this->filesystem = new Filesystem();

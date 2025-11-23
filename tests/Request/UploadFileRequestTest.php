@@ -13,23 +13,19 @@ use function mime_content_type;
 final class UploadFileRequestTest extends TestCase
 {
     private string $path;
-    private string $type;
 
     protected function setUp(): void
     {
         $this->path = __DIR__.'/../data/php-logo.png';
-
-        // @phpstan-ignore-next-line
-        $this->type = mime_content_type($this->path);
     }
 
     public function testCreatingPublicRequestSetsAclAsPublic(): void
     {
-        $this->assertTrue(UploadFileRequest::public($this->path, $this->type, $this->path)->isPublic);
+        $this->assertTrue(UploadFileRequest::public($this->path, mime_content_type($this->path), $this->path)->isPublic());
     }
 
     public function testCreatingPrivateRequestSetsAclAsPublic(): void
     {
-        $this->assertFalse(UploadFileRequest::private($this->path, $this->type, $this->path)->isPublic);
+        $this->assertFalse(UploadFileRequest::private($this->path, mime_content_type($this->path), $this->path)->isPublic());
     }
 }
