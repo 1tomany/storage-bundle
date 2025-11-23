@@ -11,29 +11,40 @@ class DownloadFileRequest implements DownloadFileRequestInterface
 {
     use AssertNotEmptyTrait;
 
-    private ?string $directory = null;
+    /**
+     * @var non-empty-string
+     */
+    private string $directory;
 
     /**
      * @var non-empty-string
      */
     private string $key;
 
-    public function __construct(string $key)
+    public function __construct(string $key, ?string $directory = null)
     {
         $this->key = $this->assertNotEmpty($key, 'key');
+
+        $this->setDirectory($directory);
     }
 
     public function getDirectory(): string
     {
-        /** @var non-empty-string $directory */
-        $directory = $this->directory ?: sys_get_temp_dir();
-
-        return $directory;
+        return $this->directory;
     }
 
     public function setDirectory(?string $directory): static
     {
-        $this->directory = trim($directory ?? '') ?: null;
+        $directory = trim($directory ?? '');
+
+        if (
+            !\is_dir($directory) ||
+            !\is_writable($directory)
+        ) {
+            $directory = sys_get_temp_dir();
+        }
+
+        $this->directory = $this->assertNotEmpty($directory, 'directory');
 
         return $this;
     }
