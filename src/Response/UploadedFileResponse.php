@@ -3,12 +3,12 @@
 namespace OneToMany\StorageBundle\Response;
 
 use OneToMany\StorageBundle\Contract\Response\UploadedFileResponseInterface;
-use OneToMany\StorageBundle\Exception\InvalidArgumentException;
-
-use function trim;
+use OneToMany\StorageBundle\Trait\AssertNotEmptyTrait;
 
 class UploadedFileResponse implements UploadedFileResponseInterface
 {
+    use AssertNotEmptyTrait;
+
     /**
      * @var non-empty-string
      */
@@ -16,11 +16,7 @@ class UploadedFileResponse implements UploadedFileResponseInterface
 
     public function __construct(string $url)
     {
-        if (empty($url = trim($url))) {
-            throw new InvalidArgumentException('The URL cannot be empty.');
-        }
-
-        $this->url = $url;
+        $this->url = $this->assertNotEmpty($url, 'URL');
     }
 
     public function getUrl(): string

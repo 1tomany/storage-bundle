@@ -1,6 +1,6 @@
 <?php
 
-namespace OneToMany\StorageBundle\Request;
+namespace OneToMany\StorageBundle\Trait;
 
 use OneToMany\StorageBundle\Exception\InvalidArgumentException;
 

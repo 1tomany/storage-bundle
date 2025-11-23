@@ -3,6 +3,7 @@
 namespace OneToMany\StorageBundle\Request;
 
 use OneToMany\StorageBundle\Contract\Request\DeleteFileRequestInterface;
+use OneToMany\StorageBundle\Trait\AssertNotEmptyTrait;
 
 class DeleteFileRequest implements DeleteFileRequestInterface
 {

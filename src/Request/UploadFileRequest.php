@@ -3,6 +3,7 @@
 namespace OneToMany\StorageBundle\Request;
 
 use OneToMany\StorageBundle\Contract\Request\UploadFileRequestInterface;
+use OneToMany\StorageBundle\Trait\AssertNotEmptyTrait;
 
 use function strtolower;
 

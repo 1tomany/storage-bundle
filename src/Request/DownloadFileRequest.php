@@ -3,6 +3,7 @@
 namespace OneToMany\StorageBundle\Request;
 
 use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
+use OneToMany\StorageBundle\Trait\AssertNotEmptyTrait;
 
 use function is_dir;
 use function is_writable;

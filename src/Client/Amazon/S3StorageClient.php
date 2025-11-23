@@ -5,14 +5,17 @@ namespace OneToMany\StorageBundle\Client\Amazon;
 use Aws\S3\S3Client;
 use OneToMany\StorageBundle\Client\GenerateUrlTrait;
 use OneToMany\StorageBundle\Contract\Client\StorageClientInterface;
+use OneToMany\StorageBundle\Contract\Request\DeleteFileRequestInterface;
 use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
 use OneToMany\StorageBundle\Contract\Request\UploadFileRequestInterface;
+use OneToMany\StorageBundle\Contract\Response\DeletedFileResponseInterface;
 use OneToMany\StorageBundle\Contract\Response\DownloadedFileResponseInterface;
 use OneToMany\StorageBundle\Contract\Response\UploadedFileResponseInterface;
 use OneToMany\StorageBundle\Exception\InvalidArgumentException;
 use OneToMany\StorageBundle\Exception\RuntimeException;
 use OneToMany\StorageBundle\Response\DownloadedFileResponse;
 use OneToMany\StorageBundle\Response\UploadedFileResponse;
+use OneToMany\StorageBundle\Trait\AssertNotEmptyTrait;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Filesystem\Exception\ExceptionInterface as FilesystemExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -26,67 +29,33 @@ use function sprintf;
 
 class S3StorageClient implements StorageClientInterface
 {
+    use AssertNotEmptyTrait;
     use GenerateUrlTrait;
 
-    private Filesystem $filesystem;
+    private S3Client $s3Client; // @phpstan-ignore-line
+
+    /**
+     * @var non-empty-string
+     */
+    private string $bucket;
+
+    /**
+     * @var ?non-empty-string
+     */
+    private ?string $customUrl;
 
     public function __construct(
-        private S3Client $s3Client, // @phpstan-ignore-line
-        private string $bucket,
-        private ?string $customUrl,
+        S3Client $s3Client, // @phpstan-ignore-line
+        string $bucket,
+        ?string $customUrl,
     ) {
         if (!class_exists(S3Client::class)) {
             throw new RuntimeException('This storage client can not be used because the AWS SDK is not installed. Try running "composer require aws/aws-sdk-php-symfony".');
         }
 
-        $this->filesystem = new Filesystem();
-    }
-
-    public function download(DownloadFileRequestInterface $request): DownloadedFileResponseInterface
-    {
-        if (!is_writable($request->getDirectory())) {
-            throw new InvalidArgumentException(sprintf('Downloading the file "%s" failed because the directory "%s" is not writable.', $request->getKey(), $request->getDirectory()));
-        }
-
-        try {
-            $file = $this->s3Client->getObject([
-                'Bucket' => $this->bucket,
-                'Key' => $request->getKey(),
-            ]);
-
-            $body = $file->get('Body'); // @phpstan-ignore-line
-
-            if (!$body instanceof StreamInterface) {
-                throw new RuntimeException(sprintf('Downloading the file "%s" failed because the remote server failed to stream the contents.', $request->getKey()));
-            }
-        } catch (\Exception $e) {
-            throw new RuntimeException(sprintf('Downloading the file "%s" failed.', $request->getKey()), previous: $e);
-        }
-
-        try {
-            // Resolve the extension for the temporary file
-            $extension = Path::getExtension($request->getKey(), true);
-
-            if (false === empty($extension)) {
-                $extension = ".{$extension}";
-            }
-
-            $filePath = $this->filesystem->tempnam($request->getDirectory(), $request::PREFIX, $extension);
-        } catch (FilesystemExceptionInterface $e) {
-            throw new RuntimeException(sprintf('Downloading the file "%s" failed because a temporary file could not be created on the filesystem.', $request->getKey()), previous: $e);
-        }
-
-        try {
-            $this->filesystem->dumpFile($filePath, $body->getContents());
-        } catch (FilesystemExceptionInterface $e) {
-            if ($this->filesystem->exists($filePath)) {
-                $this->filesystem->remove($filePath);
-            }
-
-            throw new RuntimeException(sprintf('Downloading the file "%s" failed because the file contents could not be written to "%s".', $request->getKey(), $filePath), previous: $e);
-        }
-
-        return new DownloadedFileResponse($filePath);
+        $this->s3Client = $s3Client;
+        $this->bucket = $this->assertNotEmpty($bucket, 'bucket');
+        $this->customUrl = \trim($customUrl ?? '') ?: null;
     }
 
     public function upload(UploadFileRequestInterface $request): UploadedFileResponseInterface
@@ -115,5 +84,66 @@ class S3StorageClient implements StorageClientInterface
         }
 
         return new UploadedFileResponse($this->generateUrl($url, $this->customUrl, $request->getKey()));
+    }
+
+    public function download(DownloadFileRequestInterface $request): DownloadedFileResponseInterface
+    {
+        if (!is_writable($request->getDirectory())) {
+            throw new InvalidArgumentException(sprintf('Downloading the file "%s" failed because the directory "%s" is not writable.', $request->getKey(), $request->getDirectory()));
+        }
+
+        $filesystem = new Filesystem();
+
+        try {
+            $file = $this->s3Client->getObject([
+                'Bucket' => $this->bucket,
+                'Key' => $request->getKey(),
+            ]);
+
+            $body = $file->get('Body'); // @phpstan-ignore-line
+
+            if (!$body instanceof StreamInterface) {
+                throw new RuntimeException(sprintf('Downloading the file "%s" failed because the remote server failed to stream the contents.', $request->getKey()));
+            }
+        } catch (\Exception $e) {
+            throw new RuntimeException(sprintf('Downloading the file "%s" failed.', $request->getKey()), previous: $e);
+        }
+
+        try {
+            // Resolve the extension for the temporary file
+            $extension = Path::getExtension($request->getKey(), true);
+
+            if (false === empty($extension)) {
+                $extension = ".{$extension}";
+            }
+
+            $filePath = $filesystem->tempnam($request->getDirectory(), $request::PREFIX, $extension);
+        } catch (FilesystemExceptionInterface $e) {
+            throw new RuntimeException(sprintf('Downloading the file "%s" failed because a temporary file could not be created on the filesystem.', $request->getKey()), previous: $e);
+        }
+
+        try {
+            $filesystem->dumpFile($filePath, $body->getContents());
+        } catch (FilesystemExceptionInterface $e) {
+            if ($filesystem->exists($filePath)) {
+                $filesystem->remove($filePath);
+            }
+
+            throw new RuntimeException(sprintf('Downloading the file "%s" failed because the file contents could not be written to "%s".', $request->getKey(), $filePath), previous: $e);
+        }
+
+        return new DownloadedFileResponse($filePath);
+    }
+
+    public function delete(DeleteFileRequestInterface $request): DeletedFileResponseInterface
+    {
+        try {
+            $result = $this->s3Client->deleteObject([
+                'Bucket' => $this->bucket,
+                'Key' => $request->getKey(),
+            ]);
+        } catch (\Exception $e) {
+            throw new RuntimeException(sprintf('Deleting the file "%s" failed.', $request->getKey()), previous: $e);
+        }
     }
 }
