@@ -20,7 +20,7 @@ final class GenerateUrlTraitTest extends TestCase
     }
 
     /**
-     * @return list<list<?non-empty-string>>
+     * @return list<list<?string>>
      */
     public static function providerKeyCustomUrlAndCanonicalUrl(): array
     {
