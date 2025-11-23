@@ -61,6 +61,7 @@ class S3StorageClient implements StorageClientInterface
                 throw new RuntimeException(sprintf('Downloading the file "%s" failed because the remote server failed to stream the contents.', $request->getKey()));
             }
         } catch (\Exception $e) {
+            throw new RuntimeException(sprintf('Downloading the file "%s" failed.', $request->getKey()), previous: $e);
         }
 
         try {
