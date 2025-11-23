@@ -1,6 +1,6 @@
 <?php
 
-namespace OneToMany\StorageBundle\Tests\Client;
+namespace OneToMany\StorageBundle\Tests\Client\Mock;
 
 use OneToMany\StorageBundle\Client\Mock\MockStorageClient;
 use OneToMany\StorageBundle\Exception\RuntimeException;
@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 #[Group('UnitTests')]
 #[Group('ClientTests')]
+#[Group('MockTests')]
 final class MockStorageClientTest extends TestCase
 {
     public function testDownloadingFileIsNotImplemented(): void
