@@ -13,6 +13,7 @@ use OneToMany\StorageBundle\Contract\Response\DownloadedFileResponseInterface;
 use OneToMany\StorageBundle\Contract\Response\UploadedFileResponseInterface;
 use OneToMany\StorageBundle\Exception\InvalidArgumentException;
 use OneToMany\StorageBundle\Exception\RuntimeException;
+use OneToMany\StorageBundle\Response\DeletedFileResponse;
 use OneToMany\StorageBundle\Response\DownloadedFileResponse;
 use OneToMany\StorageBundle\Response\UploadedFileResponse;
 use OneToMany\StorageBundle\Trait\AssertNotEmptyTrait;
@@ -94,7 +95,7 @@ class S3StorageClient implements StorageClientInterface
             throw new RuntimeException(sprintf('Uploading the file "%s" to "%s" failed.', $request->getPath(), $request->getKey()), previous: $e);
         }
 
-        return new UploadedFileResponse($this->generateUrl($url, $this->customUrl, $request->getKey()));
+        return new UploadedFileResponse($this->generateUrl($url, $this->getCustomUrl(), $request->getKey()));
     }
 
     public function download(DownloadFileRequestInterface $request): DownloadedFileResponseInterface
@@ -107,7 +108,7 @@ class S3StorageClient implements StorageClientInterface
 
         try {
             $file = $this->s3Client->getObject([
-                'Bucket' => $this->bucket,
+                'Bucket' => $this->getBucket(),
                 'Key' => $request->getKey(),
             ]);
 
@@ -150,11 +151,13 @@ class S3StorageClient implements StorageClientInterface
     {
         try {
             $result = $this->s3Client->deleteObject([
-                'Bucket' => $this->bucket,
+                'Bucket' => $this->getBucket(),
                 'Key' => $request->getKey(),
             ]);
         } catch (\Exception $e) {
             throw new RuntimeException(sprintf('Deleting the file "%s" failed.', $request->getKey()), previous: $e);
         }
+
+        return new DeletedFileResponse();
     }
 }

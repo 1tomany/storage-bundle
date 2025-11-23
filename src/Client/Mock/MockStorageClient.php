@@ -57,7 +57,7 @@ class MockStorageClient implements StorageClientInterface
             $this->bucket, $request->getKey(),
         ]);
 
-        return new UploadedFileResponse($this->generateUrl($url, $this->customUrl, $request->getKey()));
+        return new UploadedFileResponse($this->generateUrl($url, $this->getCustomUrl(), $request->getKey()));
     }
 
     public function download(DownloadFileRequestInterface $request): DownloadedFileResponseInterface
