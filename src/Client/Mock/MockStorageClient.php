@@ -13,17 +13,42 @@ use OneToMany\StorageBundle\Contract\Response\UploadedFileResponseInterface;
 use OneToMany\StorageBundle\Exception\RuntimeException;
 use OneToMany\StorageBundle\Response\DeletedFileResponse;
 use OneToMany\StorageBundle\Response\UploadedFileResponse;
+use OneToMany\StorageBundle\Trait\AssertNotEmptyTrait;
 
+use function trim;
 use function vsprintf;
 
 class MockStorageClient implements StorageClientInterface
 {
+    use AssertNotEmptyTrait;
     use GenerateUrlTrait;
 
+    /**
+     * @var non-empty-string
+     */
+    private string $bucket;
+
+    /**
+     * @var ?non-empty-string
+     */
+    private ?string $customUrl;
+
     public function __construct(
-        private string $bucket,
-        private ?string $customUrl = null,
+        string $bucket,
+        ?string $customUrl = null,
     ) {
+        $this->bucket = $this->assertNotEmpty($bucket, 'bucket');
+        $this->customUrl = trim($customUrl ?? '') ?: null;
+    }
+
+    public function getBucket(): string
+    {
+        return $this->bucket;
+    }
+
+    public function getCustomUrl(): ?string
+    {
+        return $this->customUrl;
     }
 
     public function upload(UploadFileRequestInterface $request): UploadedFileResponseInterface

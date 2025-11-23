@@ -26,6 +26,7 @@ use function file_exists;
 use function is_readable;
 use function is_writable;
 use function sprintf;
+use function trim;
 
 class S3StorageClient implements StorageClientInterface
 {
@@ -55,7 +56,17 @@ class S3StorageClient implements StorageClientInterface
 
         $this->s3Client = $s3Client;
         $this->bucket = $this->assertNotEmpty($bucket, 'bucket');
-        $this->customUrl = \trim($customUrl ?? '') ?: null;
+        $this->customUrl = trim($customUrl ?? '') ?: null;
+    }
+
+    public function getBucket(): string
+    {
+        return $this->bucket;
+    }
+
+    public function getCustomUrl(): ?string
+    {
+        return $this->customUrl;
     }
 
     public function upload(UploadFileRequestInterface $request): UploadedFileResponseInterface

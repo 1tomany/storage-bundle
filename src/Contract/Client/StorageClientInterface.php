@@ -11,6 +11,16 @@ use OneToMany\StorageBundle\Contract\Response\UploadedFileResponseInterface;
 
 interface StorageClientInterface
 {
+    /**
+     * @return non-empty-string
+     */
+    public function getBucket(): string;
+
+    /**
+     * @return ?non-empty-string
+     */
+    public function getCustomUrl(): ?string;
+
     public function upload(UploadFileRequestInterface $request): UploadedFileResponseInterface;
 
     public function download(DownloadFileRequestInterface $request): DownloadedFileResponseInterface;
