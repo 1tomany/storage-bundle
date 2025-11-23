@@ -13,12 +13,12 @@ abstract class AbstractStorageClient implements StorageClientInterface
     /**
      * @var non-empty-string
      */
-    protected string $bucket;
+    protected readonly string $bucket;
 
     /**
      * @var ?non-empty-string
      */
-    protected ?string $customUrl;
+    protected readonly ?string $customUrl;
 
     public function __construct(
         string $bucket,
