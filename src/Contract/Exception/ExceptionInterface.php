@@ -1,6 +1,6 @@
 <?php
 
-namespace OneToMany\StorageBundle\Exception;
+namespace OneToMany\StorageBundle\Contract\Exception;
 
 interface ExceptionInterface extends \Throwable
 {

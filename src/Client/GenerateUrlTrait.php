@@ -1,7 +1,8 @@
 <?php
 
-namespace OneToMany\StorageBundle\Service;
+namespace OneToMany\StorageBundle\Client;
 
+use function implode;
 use function rtrim;
 use function trim;
 
