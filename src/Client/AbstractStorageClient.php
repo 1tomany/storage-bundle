@@ -8,6 +8,7 @@ use OneToMany\StorageBundle\Trait\AssertNotEmptyTrait;
 abstract class AbstractStorageClient implements StorageClientInterface
 {
     use AssertNotEmptyTrait;
+    use GenerateUrlTrait;
 
     /**
      * @var non-empty-string

@@ -31,10 +31,10 @@ use function sprintf;
 
 class S3StorageClient extends AbstractStorageClient
 {
-    use GenerateUrlTrait;
-
+    /** @disregard P1009 Undefined type */
     private S3Client $s3Client; // @phpstan-ignore-line
 
+    /** @disregard P1009 Undefined type */
     public function __construct(
         S3Client $s3Client, // @phpstan-ignore-line
         string $bucket,
@@ -42,6 +42,7 @@ class S3StorageClient extends AbstractStorageClient
     ) {
         parent::__construct($bucket, $customUrl);
 
+        /** @disregard P1009 Undefined type */
         if (!class_exists(S3Client::class)) {
             throw new RuntimeException('This storage client can not be used because the AWS SDK is not installed. Try running "composer require aws/aws-sdk-php-symfony".');
         }

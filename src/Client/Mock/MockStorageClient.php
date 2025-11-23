@@ -18,8 +18,6 @@ use function vsprintf;
 
 class MockStorageClient extends AbstractStorageClient
 {
-    use GenerateUrlTrait;
-
     public function upload(UploadFileRequestInterface $request): UploadedFileResponseInterface
     {
         $url = vsprintf('https://mock-storage.service/%s/%s', [
