@@ -70,22 +70,22 @@ class S3StorageClient implements StorageClientInterface
                 $extension = ".{$extension}";
             }
 
-            $temporaryFilePath = $this->filesystem->tempnam($request->getDirectory(), $request::PREFIX, $extension);
+            $filePath = $this->filesystem->tempnam($request->getDirectory(), $request::PREFIX, $extension);
         } catch (FilesystemExceptionInterface $e) {
             throw new RuntimeException(sprintf('Downloading the file "%s" failed because a temporary file could not be created on the filesystem.', $request->getKey()), previous: $e);
         }
 
         try {
-            $this->filesystem->dumpFile($temporaryFilePath, $body->getContents());
+            $this->filesystem->dumpFile($filePath, $body->getContents());
         } catch (FilesystemExceptionInterface $e) {
-            if ($this->filesystem->exists($temporaryFilePath)) {
-                $this->filesystem->remove($temporaryFilePath);
+            if ($this->filesystem->exists($filePath)) {
+                $this->filesystem->remove($filePath);
             }
 
-            throw new RuntimeException(sprintf('Downloading the file "%s" failed because the file contents could not be written to "%s".', $request->getKey(), $temporaryFilePath), previous: $e);
+            throw new RuntimeException(sprintf('Downloading the file "%s" failed because the file contents could not be written to "%s".', $request->getKey(), $filePath), previous: $e);
         }
 
-        return new DownloadedFileResponse($temporaryFilePath);
+        return new DownloadedFileResponse($filePath);
     }
 
     /**
