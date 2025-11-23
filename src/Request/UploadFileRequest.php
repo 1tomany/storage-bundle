@@ -83,6 +83,25 @@ class UploadFileRequest implements UploadFileRequestInterface
         return $this;
     }
 
+    public function isPublic(): bool
+    {
+        return $this->isPublic;
+    }
+
+    public function markAsPublic(): static
+    {
+        $this->isPublic = true;
+
+        return $this;
+    }
+
+    public function markAsPrivate(): static
+    {
+        $this->isPublic = false;
+
+        return $this;
+    }
+
     /**
      * @return non-empty-string
      */

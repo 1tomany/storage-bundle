@@ -25,6 +25,8 @@ interface UploadFileRequestInterface
 
     public function setKey(string $key): static;
 
+    public function isPublic(): bool;
+
     public function markAsPublic(): static;
 
     public function markAsPrivate(): static;
