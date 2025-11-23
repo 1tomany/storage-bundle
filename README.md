@@ -122,8 +122,9 @@ final readonly class UploadFileHandler
 }
 ```
 
-However, I **do not** recommend using an instance of the `StorageClientInterface` interface directly. Instead, you should use an action class. There are two action interfaces:
+However, I **do not** recommend using an instance of the `StorageClientInterface` interface directly. Instead, you should use an action class. There are three action interfaces:
 
+- `OneToMany\StorageBundle\Contract\Action\DeleteFileActionInterface`
 - `OneToMany\StorageBundle\Contract\Action\DownloadFileActionInterface`
 - `OneToMany\StorageBundle\Contract\Action\UploadFileActionInterface`
 

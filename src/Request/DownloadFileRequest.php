@@ -3,13 +3,14 @@
 namespace OneToMany\StorageBundle\Request;
 
 use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
-use OneToMany\StorageBundle\Exception\InvalidArgumentException;
 
 use function sys_get_temp_dir;
 use function trim;
 
 class DownloadFileRequest implements DownloadFileRequestInterface
 {
+    use AssertNotEmptyTrait;
+
     private ?string $directory = null;
 
     /**
@@ -19,11 +20,7 @@ class DownloadFileRequest implements DownloadFileRequestInterface
 
     public function __construct(string $key)
     {
-        if (empty($key = trim($key))) {
-            throw new InvalidArgumentException('The key cannot be empty.');
-        }
-
-        $this->key = $key;
+        $this->key = $this->assertNotEmpty($key, 'key');
     }
 
     public function getDirectory(): string
