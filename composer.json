@@ -1,5 +1,4 @@
 {
-    "version": "100.0.0",
     "name": "1tomany/storage-bundle",
     "description": "Symfony bundle to manage uploading and downloading files to and from remote storage services",
     "license": "MIT",
@@ -30,7 +29,6 @@
         "phpunit/phpunit": "^12.4"
     },
     "suggest": {
-        "1tomany/data-uri": "Provides the SmartFile object for improved local file management",
         "aws/aws-sdk-php-symfony": "Provides autowired AWS S3 client for S3 compatible storage services"
     },
     "autoload": {

@@ -34,10 +34,3 @@ services:
     OneToMany\StorageBundle\Factory\StorageClientFactory:
         arguments:
             $container: !tagged_locator { tag: 1tomany.storage_client, index_by: key }
-
-    # Actions
-    # OneToMany\StorageBundle\Contract\Action\DownloadFileActionInterface:
-    #     alias: OneToMany\StorageBundle\Action\DownloadFileAction
-
-    # OneToMany\StorageBundle\Contract\Action\UploadFileActionInterface:
-    #     alias: OneToMany\StorageBundle\Action\UploadFileAction
