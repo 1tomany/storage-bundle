@@ -33,17 +33,10 @@ final class MockStorageClientTest extends TestCase
 
     public function testUploadingFileWithCustomUrl(): void
     {
-        $bucket = 'mock-bucket';
-        $baseUrl = 'https://custom-cdn.com';
-        $fileUrl = $baseUrl.'/'.$this->key;
+        $record = new MockStorageClient('mock-bucket', 'https://custom-cdn.com')->upload(
+            new UploadFileRequest('php-logo.png', 'image/png', 'php-logo.png'),
+        );
 
-        $record = new MockStorageClient($bucket, $baseUrl)->upload(new UploadFileRequest($this->path, $this->type, $this->key));
-
-        $this->assertEquals($fileUrl, $record->url);
-    }
-
-    private function createMockStorageClient(string $bucket, ?string $baseUrl = null): MockStorageClient
-    {
-        return new MockStorageClient($bucket, $baseUrl);
+        $this->assertEquals('https://custom-cdn.com/php-logo.png', $record->getUrl());
     }
 }
