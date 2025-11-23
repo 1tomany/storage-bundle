@@ -1,8 +1,0 @@
-<?php
-
-namespace Aws;
-
-class Result
-{
-    public function get(string $key): mixed;
-}
