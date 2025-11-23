@@ -4,7 +4,6 @@ namespace OneToMany\StorageBundle\Tests\Request;
 
 use OneToMany\StorageBundle\Exception\InvalidArgumentException;
 use OneToMany\StorageBundle\Request\DownloadFileRequest;
-use OneToMany\StorageBundle\Request\UploadFileRequest;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
