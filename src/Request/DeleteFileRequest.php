@@ -14,7 +14,7 @@ class DeleteFileRequest implements DeleteFileRequestInterface
     /**
      * @var non-empty-string
      */
-    private string $key;
+    private readonly string $key;
 
     public function __construct(string $key)
     {

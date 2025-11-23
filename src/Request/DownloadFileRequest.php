@@ -17,7 +17,7 @@ class DownloadFileRequest implements DownloadFileRequestInterface
     /**
      * @var non-empty-string
      */
-    private string $key;
+    private readonly string $key;
 
     /**
      * @var non-empty-string

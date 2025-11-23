@@ -128,7 +128,7 @@ class S3StorageClient extends AbstractStorageClient
     public function delete(DeleteFileRequestInterface $request): DeletedFileResponseInterface
     {
         try {
-            $result = $this->s3Client->deleteObject([
+            $this->s3Client->deleteObject([
                 'Bucket' => $this->getBucket(),
                 'Key' => $request->getKey(),
             ]);
