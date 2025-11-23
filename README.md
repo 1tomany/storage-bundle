@@ -21,7 +21,7 @@ This bundle does not have a Symfony Flex recipe yet, so you'll have to manually 
 
 ```env
 ###> 1tomany/storage-bundle ###
-STORAGE_SERVICE="aws"
+STORAGE_SERVICE="s3"
 STORAGE_BUCKET="my-bucket-name"
 STORAGE_CUSTOM_URL=
 ###< 1tomany/storage-bundle ###
@@ -38,7 +38,7 @@ STORAGE_SERVICE="mock"
 #### `STORAGE_SERVICE`
 The storage provider to use. Possible values are:
 
-- `aws` Amazon S3
+- `s3` Amazon S3 compatible service
 - `mock` A mock service for testing
 
 #### `STORAGE_BUCKET`
@@ -97,45 +97,37 @@ aws:
 ```
 
 ## Using actions
-This bundle registers a factory in the the Symfony container that will create a storage provider service object. Each storage provider service class implements a common interface: `OneToMany\StorageBundle\Service\StorageServiceInterface`. When a variable of this type is injected, the Symfony container will create the concrete storage provider service object defined by the `STORAGE_SERVICE` environment variable.
+This bundle registers a factory in the the Symfony container that will create a storage client provider service object. Each storage provider service class implements a common interface: `OneToMany\StorageBundle\Contract\Client\StorageClientInterface`. When a variable of this type is injected, the Symfony container will create the concrete storage provider service object defined by the `STORAGE_SERVICE` environment variable.
 
 ```php
 <?php
 
 namespace App\File\Action\Handler;
 
-use OneToMany\StorageBundle\Record\RemoteFileRecord;
+use OneToMany\StorageBundle\Contract\Client\StorageClientInterface;
 use OneToMany\StorageBundle\Request\UploadFileRequest;
-use OneToMany\StorageBundle\Service\StorageServiceInterface;
 
 final readonly class UploadFileHandler
 {
-    public function __construct(private StorageServiceInterface $storageService)
+    public function __construct(private StorageClientInterface $storageClient)
     {
-        // $storageService is an instance of OneToMany\StorageBundle\Service\AwsStorageService
-        // if the STORAGE_SERVICE environment variable is set to "aws".
     }
 
-    public function __invoke(string $filePath, string $remoteKey): void
+    public function __invoke(string $path, string $mimeType, string $key): void
     {
-        $record = $this->storageService->upload(
-            UploadFileRequest::public(...[
-                'filePath' => $filePath,
-                'remoteKey' => $remoteKey,
-            ])
-        );
+        $response = $this->storageClient->act(new UploadFileRequest($path, $mimeType, $key));
 
-        // assert($record instanceof RemoteFileRecord);
+        // assert($record instanceof UploadedFileResponseInterface);
     }
 }
 ```
 
-However, I **do not** recommend using the `StorageServiceInterface` directly. Instead, you should use an action class. There are two action classes:
+However, I **do not** recommend using an instance of the `StorageClientInterface` interface directly. Instead, you should use an action class. There are two action interfaces:
 
-- `OneToMany\StorageBundle\Action\DownloadFileAction`
-- `OneToMany\StorageBundle\Action\UploadFileAction`
+- `OneToMany\StorageBundle\Contract\Action\DownloadFileActionInterface`
+- `OneToMany\StorageBundle\Contract\Action\UploadFileActionInterface`
 
-Each of these expose a single public function, `act()`, which calls the actual `StorageServiceInterface` method to perform the action requested.
+Each of these expose a single public function, `act()`, which calls the actual `StorageClientInterface` method to perform the action requested.
 
 The code above would be rewritten as follows:
 
@@ -144,26 +136,20 @@ The code above would be rewritten as follows:
 
 namespace App\File\Action\Handler;
 
-use OneToMany\StorageBundle\Action\UploadFileAction;
-use OneToMany\StorageBundle\Record\RemoteFileRecord;
+use OneToMany\StorageBundle\Contract\Action\UploadFileActionInterface;
 use OneToMany\StorageBundle\Request\UploadFileRequest;
 
 final readonly class UploadFileHandler
 {
-    public function __construct(private UploadFileAction $uploadFileAction)
+    public function __construct(private UploadFileActionInterface $uploadFileAction)
     {
     }
 
-    public function __invoke(string $filePath, string $remoteKey): void
+    public function __invoke(string $path, string $mimeType, string $key): void
     {
-        $record = $this->uploadFileAction->act(
-            UploadFileRequest::public(...[
-                'filePath' => $filePath,
-                'remoteKey' => $remoteKey,
-            ])
-        );
-
-        // assert($record instanceof RemoteFileRecord);
+        $record = $this->uploadFileAction->act(new UploadFileRequest($path, $mimeType, $key));
+        
+        // assert($record instanceof UploadedFileResponseInterface);
     }
 }
 ```
@@ -171,9 +157,9 @@ final readonly class UploadFileHandler
 ### Action philosophy
 The difference is subtle, but I prefer using the action classes for a few reasons:
 
-1. The class name indicates the action being performed: `UploadFileAction` clearly indicates that we're uploading a file.
-2. Any non-provider-specific pre or post-processing computation can be handled in the `act()` method rather than reimplementing it in each storage provider class.
-3. They can be mocked in tests easier. Because a concrete object is being injected, only the `act()` method needs to be mocked. Mocking (or creating an anonymous class of) an interface is more difficult and often overkill for a test that's only testing one codepath.
+1. The interface name indicates the action being performed. By injecting an object of type `UploadFileActionInterface`, it's clear that you intend for this service to upload a file.
+2. Any non-client-specific pre or post-processing can be handled in the `act()` method rather than reimplementing it in each storage client class.
+3. They can be mocked in tests easier. Because a concrete object is being injected, only the `act()` method needs to be mocked. Mocking (or creating an anonymous class of) the `ServiceClientInterface` is more difficult and often overkill for a test that's only testing one action.
 
 ## Credits
 - [Vic Cherubini](https://github.com/viccherubini), [1:N Labs, LLC](https://1tomany.com)
