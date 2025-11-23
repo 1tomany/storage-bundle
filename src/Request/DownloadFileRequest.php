@@ -4,6 +4,8 @@ namespace OneToMany\StorageBundle\Request;
 
 use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
 
+use function is_dir;
+use function is_writable;
 use function sys_get_temp_dir;
 use function trim;
 
@@ -38,8 +40,8 @@ class DownloadFileRequest implements DownloadFileRequestInterface
         $directory = trim($directory ?? '');
 
         if (
-            !\is_dir($directory) ||
-            !\is_writable($directory)
+            !is_dir($directory)
+            || !is_writable($directory)
         ) {
             $directory = sys_get_temp_dir();
         }
