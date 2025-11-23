@@ -6,7 +6,6 @@ use OneToMany\StorageBundle\Client\Mock\MockStorageClient;
 use OneToMany\StorageBundle\Exception\RuntimeException;
 use OneToMany\StorageBundle\Request\DownloadFileRequest;
 use OneToMany\StorageBundle\Request\UploadFileRequest;
-use OneToMany\StorageBundle\Tests\FileTestCase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
