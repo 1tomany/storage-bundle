@@ -5,6 +5,8 @@ namespace OneToMany\StorageBundle\Response;
 use OneToMany\StorageBundle\Contract\Response\DownloadedFileResponseInterface;
 use OneToMany\StorageBundle\Exception\InvalidArgumentException;
 
+use function trim;
+
 class DownloadedFileResponse implements DownloadedFileResponseInterface
 {
     /**
