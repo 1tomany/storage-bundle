@@ -136,6 +136,6 @@ class S3StorageClient extends AbstractStorageClient
             throw new RuntimeException(sprintf('Deleting the file "%s" failed.', $request->getKey()), previous: $e);
         }
 
-        return new DeletedFileResponse();
+        return new DeletedFileResponse($request->getKey());
     }
 }

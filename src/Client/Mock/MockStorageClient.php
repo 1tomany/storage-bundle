@@ -33,6 +33,6 @@ class MockStorageClient extends AbstractStorageClient
 
     public function delete(DeleteFileRequestInterface $request): DeletedFileResponseInterface
     {
-        return new DeletedFileResponse();
+        return new DeletedFileResponse($request->getKey());
     }
 }
