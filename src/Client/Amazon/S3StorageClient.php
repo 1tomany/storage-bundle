@@ -4,8 +4,6 @@ namespace OneToMany\StorageBundle\Client\Amazon;
 
 use Aws\S3\S3Client;
 use OneToMany\StorageBundle\Client\AbstractStorageClient;
-use OneToMany\StorageBundle\Client\GenerateUrlTrait;
-use OneToMany\StorageBundle\Contract\Client\StorageClientInterface;
 use OneToMany\StorageBundle\Contract\Request\DeleteFileRequestInterface;
 use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
 use OneToMany\StorageBundle\Contract\Request\UploadFileRequestInterface;
@@ -17,7 +15,6 @@ use OneToMany\StorageBundle\Exception\RuntimeException;
 use OneToMany\StorageBundle\Response\DeletedFileResponse;
 use OneToMany\StorageBundle\Response\DownloadedFileResponse;
 use OneToMany\StorageBundle\Response\UploadedFileResponse;
-use OneToMany\StorageBundle\Trait\AssertNotEmptyTrait;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Filesystem\Exception\ExceptionInterface as FilesystemExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -26,38 +23,24 @@ use Symfony\Component\Filesystem\Path;
 use function class_exists;
 use function file_exists;
 use function is_readable;
+use function is_string;
 use function is_writable;
 use function sprintf;
 
 class S3StorageClient extends AbstractStorageClient
 {
     /** @disregard P1009 Undefined type */
-    private S3Client $s3Client; // @phpstan-ignore-line
-
-    /** @disregard P1009 Undefined type */
     public function __construct(
-        S3Client $s3Client, // @phpstan-ignore-line
+        private S3Client $s3Client, // @phpstan-ignore-line
         string $bucket,
         ?string $customUrl,
     ) {
-        parent::__construct($bucket, $customUrl);
-
         /** @disregard P1009 Undefined type */
         if (!class_exists(S3Client::class)) {
             throw new RuntimeException('This storage client can not be used because the AWS SDK is not installed. Try running "composer require aws/aws-sdk-php-symfony".');
         }
 
-        $this->s3Client = $s3Client;
-    }
-
-    public function getBucket(): string
-    {
-        return $this->bucket;
-    }
-
-    public function getCustomUrl(): ?string
-    {
-        return $this->customUrl;
+        parent::__construct($bucket, $customUrl);
     }
 
     public function upload(UploadFileRequestInterface $request): UploadedFileResponseInterface
@@ -67,25 +50,30 @@ class S3StorageClient extends AbstractStorageClient
         }
 
         try {
-            $acl = function (bool $isPublic): string {
-                return $isPublic ? 'public-read' : 'private';
+            $resolveACL = function (UploadFileRequestInterface $request): string {
+                return $request->isPublic() ? 'public-read' : 'private';
             };
 
             $result = $this->s3Client->putObject([
-                'Bucket' => $this->bucket,
+                'Bucket' => $this->getBucket(),
                 'Key' => $request->getKey(),
+                'ACL' => $resolveACL($request),
                 'SourceFile' => $request->getPath(),
-                'ACL' => $acl($request->isPublic()),
                 'Content-Type' => $request->getMimeType(),
             ]);
 
-            /** @var non-empty-string $url */
             $url = $result->get('ObjectURL'); // @phpstan-ignore-line
         } catch (\Exception $e) {
             throw new RuntimeException(sprintf('Uploading the file "%s" to "%s" failed.', $request->getPath(), $request->getKey()), previous: $e);
         }
 
-        return new UploadedFileResponse($this->generateUrl($url, $this->getCustomUrl(), $request->getKey()));
+        if (!is_string($url) || empty($url)) {
+            throw new RuntimeException(sprintf('Uploading the file "%s" to "%s" failed because an invalid URL was returned.', $request->getPath(), $request->getKey()));
+        }
+
+        $url = $this->generateUrl($url, $this->getCustomUrl(), $request->getKey());
+
+        return new UploadedFileResponse($url);
     }
 
     public function download(DownloadFileRequestInterface $request): DownloadedFileResponseInterface

@@ -3,7 +3,6 @@
 namespace OneToMany\StorageBundle\Client\Mock;
 
 use OneToMany\StorageBundle\Client\AbstractStorageClient;
-use OneToMany\StorageBundle\Client\GenerateUrlTrait;
 use OneToMany\StorageBundle\Contract\Request\DeleteFileRequestInterface;
 use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
 use OneToMany\StorageBundle\Contract\Request\UploadFileRequestInterface;
