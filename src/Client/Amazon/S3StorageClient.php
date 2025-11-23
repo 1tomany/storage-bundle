@@ -11,7 +11,6 @@ use OneToMany\StorageBundle\Contract\Response\DownloadedFileResponseInterface;
 use OneToMany\StorageBundle\Contract\Response\UploadedFileResponseInterface;
 use OneToMany\StorageBundle\Exception\InvalidArgumentException;
 use OneToMany\StorageBundle\Exception\RuntimeException;
-use OneToMany\StorageBundle\Exception\UploadingFileFailedException;
 use OneToMany\StorageBundle\Response\DownloadedFileResponse;
 use OneToMany\StorageBundle\Response\UploadedFileResponse;
 use Psr\Http\Message\StreamInterface;
@@ -112,7 +111,7 @@ class S3StorageClient implements StorageClientInterface
             /** @var non-empty-string $url */
             $url = $result->get('ObjectURL'); // @phpstan-ignore-line
         } catch (\Exception $e) {
-            throw new UploadingFileFailedException($request->key, $e);
+            throw new RuntimeException(sprintf('Uploading the file "%s" to "%s" failed.', $request->getPath(), $request->getKey()), previous: $e);
         }
 
         return new UploadedFileResponse($this->generateUrl($url, $this->customUrl, $request->getKey()));
