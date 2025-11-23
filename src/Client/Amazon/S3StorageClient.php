@@ -8,12 +8,14 @@ use OneToMany\StorageBundle\Contract\Client\StorageClientInterface;
 use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
 use OneToMany\StorageBundle\Contract\Request\UploadFileRequestInterface;
 use OneToMany\StorageBundle\Contract\Response\DownloadedFileResponseInterface;
+use OneToMany\StorageBundle\Contract\Response\UploadedFileResponseInterface;
 use OneToMany\StorageBundle\Exception\InvalidArgumentException;
 use OneToMany\StorageBundle\Exception\LocalFileNotReadableForUploadException;
 use OneToMany\StorageBundle\Exception\RuntimeException;
 use OneToMany\StorageBundle\Exception\UploadingFileFailedException;
 use OneToMany\StorageBundle\Record\RemoteFileRecord;
 use OneToMany\StorageBundle\Response\DownloadedFileResponse;
+use OneToMany\StorageBundle\Response\UploadedFileResponse;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Filesystem\Exception\ExceptionInterface as FilesystemExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -89,13 +91,10 @@ class S3StorageClient implements StorageClientInterface
         return new DownloadedFileResponse($filePath);
     }
 
-    /**
-     * @see OneToMany\StorageBundle\StorageServiceInterface
-     */
-    public function upload(UploadFileRequestInterface $request): RemoteFileRecord
+    public function upload(UploadFileRequestInterface $request): UploadedFileResponseInterface
     {
-        if (!file_exists($request->path) || !is_readable($request->path)) {
-            throw new LocalFileNotReadableForUploadException($request->path);
+        if (!file_exists($request->getPath()) || !is_readable($request->getPath())) {
+            throw new InvalidArgumentException(sprintf('Uploading the file "%s" failed because the file does not exist or is not readable.', $request->getPath()));
         }
 
         try {
@@ -105,10 +104,10 @@ class S3StorageClient implements StorageClientInterface
 
             $result = $this->s3Client->putObject([
                 'Bucket' => $this->bucket,
-                'Key' => $request->key,
-                'Content-Type' => $request->type,
-                'SourceFile' => $request->path,
-                'ACL' => $acl($request->isPublic),
+                'Key' => $request->getKey(),
+                'SourceFile' => $request->getPath(),
+                'ACL' => $acl($request->isPublic()),
+                'Content-Type' => $request->getMimeType(),
             ]);
 
             /** @var non-empty-string $url */
@@ -117,6 +116,6 @@ class S3StorageClient implements StorageClientInterface
             throw new UploadingFileFailedException($request->key, $e);
         }
 
-        return new RemoteFileRecord($this->generateUrl($url, $this->customUrl, $request->key));
+        return new UploadedFileResponse($this->generateUrl($url, $this->customUrl, $request->getKey()));
     }
 }
