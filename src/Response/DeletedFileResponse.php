@@ -5,7 +5,7 @@ namespace OneToMany\StorageBundle\Response;
 use OneToMany\StorageBundle\Contract\Response\DeletedFileResponseInterface;
 use OneToMany\StorageBundle\Trait\AssertNotEmptyTrait;
 
-class DeletedFileResponse implements DeletedFileResponseInterface
+readonly class DeletedFileResponse implements DeletedFileResponseInterface
 {
     use AssertNotEmptyTrait;
 

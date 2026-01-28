@@ -5,7 +5,7 @@ namespace OneToMany\StorageBundle\Response;
 use OneToMany\StorageBundle\Contract\Response\UploadedFileResponseInterface;
 use OneToMany\StorageBundle\Trait\AssertNotEmptyTrait;
 
-class UploadedFileResponse implements UploadedFileResponseInterface
+readonly class UploadedFileResponse implements UploadedFileResponseInterface
 {
     use AssertNotEmptyTrait;
 

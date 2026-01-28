@@ -1,8 +1,8 @@
 <?php
 
-namespace OneToMany\StorageBundle\Tests\Client;
+namespace OneToMany\StorageBundle\Tests\Client\Trait;
 
-use OneToMany\StorageBundle\Client\GenerateUrlTrait;
+use OneToMany\StorageBundle\Client\Trait\GenerateUrlTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;

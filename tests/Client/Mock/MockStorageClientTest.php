@@ -11,7 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 #[Group('UnitTests')]
 #[Group('ClientTests')]
-#[Group('MockTests')]
 final class MockStorageClientTest extends TestCase
 {
     public function testDownloadingFileIsNotImplemented(): void
@@ -24,19 +23,28 @@ final class MockStorageClientTest extends TestCase
 
     public function testUploadingFileWithoutCustomUrl(): void
     {
-        $record = new MockStorageClient('mock-bucket', null)->upload(
-            new UploadFileRequest('php-logo.png', 'image/png', 'php-logo.png'),
-        );
+        $uploadFileRequest = new UploadFileRequest('php-logo.png', 'image/png', 'php-logo.png');
+
+        $record = $this->createStorageClient()->upload(...[
+            'request' => $uploadFileRequest,
+        ]);
 
         $this->assertEquals('https://mock-storage.service/mock-bucket/php-logo.png', $record->getUrl());
     }
 
     public function testUploadingFileWithCustomUrl(): void
     {
-        $record = new MockStorageClient('mock-bucket', 'https://custom-cdn.com')->upload(
-            new UploadFileRequest('php-logo.png', 'image/png', 'php-logo.png'),
-        );
+        $uploadFileRequest = new UploadFileRequest('php-logo.png', 'image/png', 'php-logo.png');
+
+        $record = $this->createStorageClient(customUrl: 'https://custom-cdn.com')->upload(...[
+            'request' => $uploadFileRequest,
+        ]);
 
         $this->assertEquals('https://custom-cdn.com/php-logo.png', $record->getUrl());
+    }
+
+    private function createStorageClient(string $bucket = 'mock-bucket', ?string $customUrl = null): MockStorageClient
+    {
+        return new MockStorageClient($bucket, $customUrl);
     }
 }

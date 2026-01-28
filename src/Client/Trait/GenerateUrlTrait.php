@@ -1,6 +1,6 @@
 <?php
 
-namespace OneToMany\StorageBundle\Client;
+namespace OneToMany\StorageBundle\Client\Trait;
 
 use function implode;
 use function rtrim;

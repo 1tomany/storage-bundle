@@ -2,6 +2,7 @@
 
 namespace OneToMany\StorageBundle\Client;
 
+use OneToMany\StorageBundle\Client\Trait\GenerateUrlTrait;
 use OneToMany\StorageBundle\Contract\Client\StorageClientInterface;
 use OneToMany\StorageBundle\Trait\AssertNotEmptyTrait;
 
