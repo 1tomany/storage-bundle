@@ -4,8 +4,8 @@ namespace OneToMany\StorageBundle\Action;
 
 use OneToMany\StorageBundle\Contract\Action\DownloadActionInterface;
 use OneToMany\StorageBundle\Contract\Client\StorageClientInterface;
-use OneToMany\StorageBundle\Contract\Response\DownloadedFileResponseInterface;
 use OneToMany\StorageBundle\Request\DownloadRequest;
+use OneToMany\StorageBundle\Response\DownloadResponse;
 
 readonly class DownloadAction implements DownloadActionInterface
 {
@@ -16,7 +16,7 @@ readonly class DownloadAction implements DownloadActionInterface
     /**
      * @see OneToMany\StorageBundle\Contract\Action\DownloadActionInterface
      */
-    public function act(DownloadRequest $request): DownloadedFileResponseInterface
+    public function act(DownloadRequest $request): DownloadResponse
     {
         return $this->client->download($request);
     }

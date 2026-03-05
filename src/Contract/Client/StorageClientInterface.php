@@ -2,12 +2,12 @@
 
 namespace OneToMany\StorageBundle\Contract\Client;
 
-use OneToMany\StorageBundle\Contract\Response\DeletedFileResponseInterface;
-use OneToMany\StorageBundle\Contract\Response\DownloadedFileResponseInterface;
-use OneToMany\StorageBundle\Contract\Response\UploadedFileResponseInterface;
 use OneToMany\StorageBundle\Request\DeleteRequest;
 use OneToMany\StorageBundle\Request\DownloadRequest;
 use OneToMany\StorageBundle\Request\UploadRequest;
+use OneToMany\StorageBundle\Response\DeleteResponse;
+use OneToMany\StorageBundle\Response\DownloadResponse;
+use OneToMany\StorageBundle\Response\UploadResponse;
 
 interface StorageClientInterface
 {
@@ -21,9 +21,9 @@ interface StorageClientInterface
      */
     public function getCustomUrl(): ?string;
 
-    public function upload(UploadRequest $request): UploadedFileResponseInterface;
+    public function upload(UploadRequest $request): UploadResponse;
 
-    public function download(DownloadRequest $request): DownloadedFileResponseInterface;
+    public function download(DownloadRequest $request): DownloadResponse;
 
-    public function delete(DeleteRequest $request): DeletedFileResponseInterface;
+    public function delete(DeleteRequest $request): DeleteResponse;
 }

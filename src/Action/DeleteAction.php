@@ -4,8 +4,8 @@ namespace OneToMany\StorageBundle\Action;
 
 use OneToMany\StorageBundle\Contract\Action\DeleteActionInterface;
 use OneToMany\StorageBundle\Contract\Client\StorageClientInterface;
-use OneToMany\StorageBundle\Contract\Response\DeletedFileResponseInterface;
 use OneToMany\StorageBundle\Request\DeleteRequest;
+use OneToMany\StorageBundle\Response\DeleteResponse;
 
 readonly class DeleteAction implements DeleteActionInterface
 {
@@ -16,7 +16,7 @@ readonly class DeleteAction implements DeleteActionInterface
     /**
      * @see OneToMany\StorageBundle\Contract\Action\DeleteActionInterface
      */
-    public function act(DeleteRequest $request): DeletedFileResponseInterface
+    public function act(DeleteRequest $request): DeleteResponse
     {
         return $this->client->delete($request);
     }

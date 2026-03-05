@@ -2,10 +2,10 @@
 
 namespace OneToMany\StorageBundle\Contract\Action;
 
-use OneToMany\StorageBundle\Contract\Response\DeletedFileResponseInterface;
 use OneToMany\StorageBundle\Request\DeleteRequest;
+use OneToMany\StorageBundle\Response\DeleteResponse;
 
 interface DeleteActionInterface
 {
-    public function act(DeleteRequest $request): DeletedFileResponseInterface;
+    public function act(DeleteRequest $request): DeleteResponse;
 }

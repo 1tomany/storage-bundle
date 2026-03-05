@@ -4,10 +4,6 @@ namespace OneToMany\StorageBundle\Client\Amazon;
 
 use Aws\S3\S3Client;
 use OneToMany\StorageBundle\Client\BaseClient;
-use OneToMany\StorageBundle\Contract\Response\DeletedFileResponseInterface;
-use OneToMany\StorageBundle\Contract\Response\DownloadedFileResponseInterface;
-use OneToMany\StorageBundle\Contract\Response\UploadedFileResponseInterface;
-use OneToMany\StorageBundle\Exception\InvalidArgumentException;
 use OneToMany\StorageBundle\Exception\RuntimeException;
 use OneToMany\StorageBundle\Request\DeleteRequest;
 use OneToMany\StorageBundle\Request\DownloadRequest;
@@ -21,11 +17,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 use function class_exists;
-use function is_dir;
-use function is_file;
-use function is_readable;
 use function is_string;
-use function is_writable;
 use function sprintf;
 
 class AmazonClient extends BaseClient
@@ -47,12 +39,8 @@ class AmazonClient extends BaseClient
     /**
      * @see OneToMany\StorageBundle\Contract\Client\StorageClientInterface
      */
-    public function upload(UploadRequest $request): UploadedFileResponseInterface
+    public function upload(UploadRequest $request): UploadResponse
     {
-        if (!is_file($request->getPath()) || !is_readable($request->getPath())) {
-            throw new InvalidArgumentException(sprintf('Uploading the file "%s" failed because the file does not exist or is not readable.', $request->getPath()));
-        }
-
         try {
             $resolveAcl = function (UploadRequest $request): string {
                 return $request->isPublic() ? 'public-read' : 'private';
@@ -83,12 +71,8 @@ class AmazonClient extends BaseClient
     /**
      * @see OneToMany\StorageBundle\Contract\Client\StorageClientInterface
      */
-    public function download(DownloadRequest $request): DownloadedFileResponseInterface
+    public function download(DownloadRequest $request): DownloadResponse
     {
-        if (!is_dir($request->getDirectory()) || !is_writable($request->getDirectory())) {
-            throw new InvalidArgumentException(sprintf('Downloading the file "%s" failed because the directory "%s" is not writable.', $request->getKey(), $request->getDirectory()));
-        }
-
         $filesystem = new Filesystem();
 
         try {
@@ -131,7 +115,7 @@ class AmazonClient extends BaseClient
     /**
      * @see OneToMany\StorageBundle\Contract\Client\StorageClientInterface
      */
-    public function delete(DeleteRequest $request): DeletedFileResponseInterface
+    public function delete(DeleteRequest $request): DeleteResponse
     {
         try {
             $this->s3Client->deleteObject([
