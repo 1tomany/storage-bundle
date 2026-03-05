@@ -12,19 +12,13 @@ class UploadRequest
 {
     use ValidatePathTrait;
 
-    /**
-     * @var non-empty-string
-     */
+    /** @var non-empty-string */
     private string $path;
 
-    /**
-     * @var non-empty-lowercase-string
-     */
+    /** @var non-empty-lowercase-string */
     private string $format = self::DEFAULT_FORMAT;
 
-    /**
-     * @var non-empty-string
-     */
+    /** @var non-empty-string */
     private string $key = self::DEFAULT_KEY;
 
     public const string DEFAULT_FORMAT = 'application/octet-stream';

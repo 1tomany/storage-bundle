@@ -16,5 +16,5 @@ interface DownloadFileRequestInterface
      */
     public function getDirectory(): string;
 
-    public function setDirectory(?string $directory): static;
+    public function toDirectory(?string $directory): static;
 }
