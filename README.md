@@ -25,7 +25,7 @@ Below is the complete configuration for this bundle. To customize it for your Sy
 ```yaml
 onetomany_storage:
     client: "amazon"
-    bucket: "remote-bucket"
+    bucket: "storage-bucket"
     custom_url: ~
 
 when@test:
