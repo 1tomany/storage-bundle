@@ -35,7 +35,7 @@ class AmazonClientPass implements CompilerPassInterface
         }
 
         if (!is_a($container->get($s3ClientId), S3ClientInterface::class)) {
-            throw new InvalidArgumentException(sprintf('The service "%s" required by "%s" is not an instance of "%s". Try running "composer require aws/aws-sdk-php" or "composer require aws/aws-sdk-php-symfony" to install the AWS SDK.', $s3ClientId, AmazonClient::class, S3ClientInterface::class));
+            throw new InvalidArgumentException(sprintf('The service "%s" required by "%s" is not an instance of "%s". Try running "composer require aws/aws-sdk-php-symfony" to install the AWS SDK.', $s3ClientId, AmazonClient::class, S3ClientInterface::class));
         }
     }
 }
