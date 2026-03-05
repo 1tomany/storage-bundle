@@ -3,7 +3,7 @@
 namespace OneToMany\StorageBundle\Factory;
 
 use OneToMany\StorageBundle\Contract\Client\StorageClientInterface;
-use OneToMany\StorageBundle\Exception\InvalidArgumentException;
+use OneToMany\StorageBundle\Factory\Exception\CreatingClientFailedServiceNotFoundException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 
@@ -13,18 +13,18 @@ final readonly class StorageClientFactory
     {
     }
 
-    public function create(string $storageService): StorageClientInterface
+    public function create(string $service): StorageClientInterface
     {
         try {
-            $storageClient = $this->container->get($storageService);
+            $client = $this->container->get($service);
 
-            if (!$storageClient instanceof StorageClientInterface) {
-                throw new InvalidArgumentException(sprintf('The storage client "%s" does not implement "%s".', $storageService, StorageClientInterface::class));
+            if (!$client instanceof StorageClientInterface) {
+                throw new CreatingClientFailedServiceNotFoundException($service);
             }
         } catch (ContainerExceptionInterface $e) {
-            throw new InvalidArgumentException(sprintf('The storage service "%s" is not registered with the container.', $storageService), previous: $e);
+            throw new CreatingClientFailedServiceNotFoundException($service, $e);
         }
 
-        return $storageClient;
+        return $client;
     }
 }
