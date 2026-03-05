@@ -8,9 +8,6 @@ use OneToMany\StorageBundle\Factory\StorageClientFactory;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
-
-use function sprintf;
 
 #[Group('UnitTests')]
 #[Group('FactoryTests')]
@@ -44,17 +41,13 @@ final class StorageClientFactoryTest extends TestCase
             public function __construct()
             {
                 $this->services = [
-                    'mock' => new MockClient('mock-bucket'),
-                    'error' => new \InvalidArgumentException('Error!'),
+                    'mock' => new MockClient('bucket'),
+                    'error' => new \InvalidArgumentException(),
                 ];
             }
 
             public function get(string $id): mixed
             {
-                // if (!$this->has($id)) {
-                //     throw new class(sprintf('The service "%s" is not registered with this container.', $id)) extends \InvalidArgumentException implements NotFoundExceptionInterface {};
-                // }
-
                 return $this->services[$id] ?? null;
             }
 
