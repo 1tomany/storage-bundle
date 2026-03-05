@@ -4,7 +4,7 @@ namespace OneToMany\StorageBundle\Request;
 
 use function ltrim;
 
-class DeleteFileRequest
+class DeleteRequest
 {
     public function __construct(private string $key)
     {

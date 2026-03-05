@@ -2,19 +2,22 @@
 
 namespace OneToMany\StorageBundle\Action;
 
-use OneToMany\StorageBundle\Contract\Action\UploadFileActionInterface;
+use OneToMany\StorageBundle\Contract\Action\UploadActionInterface;
 use OneToMany\StorageBundle\Contract\Client\StorageClientInterface;
-use OneToMany\StorageBundle\Contract\Request\UploadFileRequestInterface;
 use OneToMany\StorageBundle\Contract\Response\UploadedFileResponseInterface;
+use OneToMany\StorageBundle\Request\UploadRequest;
 
-readonly class UploadFileAction implements UploadFileActionInterface
+readonly class UploadFileAction implements UploadActionInterface
 {
-    public function __construct(private StorageClientInterface $storageClient)
+    public function __construct(private StorageClientInterface $client)
     {
     }
 
-    public function act(UploadFileRequestInterface $request): UploadedFileResponseInterface
+    /**
+     * @see OneToMany\StorageBundle\Contract\Action\UploadActionInterface
+     */
+    public function act(UploadRequest $request): UploadedFileResponseInterface
     {
-        return $this->storageClient->upload($request);
+        return $this->client->upload($request);
     }
 }

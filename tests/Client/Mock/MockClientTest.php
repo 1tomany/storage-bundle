@@ -18,7 +18,9 @@ final class MockClientTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Not implemented!');
 
-        new MockStorageClient('mock-bucket')->download(new DownloadRequest('file.jpeg'));
+        new MockStorageClient('mock-bucket')->download(...[
+            'request' => new DownloadRequest('label.jpeg'),
+        ]);
     }
 
     public function testUploadingFileWithoutCustomUrl(): void
