@@ -56,9 +56,7 @@ class AmazonClient extends BaseClient
             throw new RuntimeException(sprintf('Uploading the file "%s" to "%s" failed because an invalid URL was returned.', $request->getPath(), $request->getKey()));
         }
 
-        $url = $this->generateUrl($url, $this->getCustomUrl(), $request->getKey());
-
-        return new UploadResponse($url);
+        return new UploadResponse($this->generateUrl($url, $this->getCustomUrl(), $request->getKey()));
     }
 
     /**
