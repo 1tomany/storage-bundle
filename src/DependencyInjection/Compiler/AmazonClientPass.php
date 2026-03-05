@@ -36,13 +36,7 @@ class AmazonClientPass implements CompilerPassInterface
             throw new InvalidArgumentException(sprintf('The "$s3Client" argument required by "%s::__construct()" is expected to be a reference to a service.', AmazonClient::class));
         }
 
-        $s3ClientId = $s3ClientArg->__toString();
-
-        if (!$container->hasDefinition($s3ClientId)) {
-            throw new InvalidArgumentException(sprintf('The service "%s" required by "%s" does not exist.', $s3ClientId, AmazonClient::class));
-        }
-
-        $s3ClientArgClass = $container->getDefinition($s3ClientId)->getClass();
+        $s3ClientArgClass = $container->getDefinition($s3ClientArg->__toString())->getClass();
 
         if (null === $s3ClientArgClass) {
             throw new InvalidArgumentException(sprintf('The "$s3Client" argument required by "%s::__construct()" must reference a class.', AmazonClient::class));
