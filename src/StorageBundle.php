@@ -15,12 +15,9 @@ use OneToMany\StorageBundle\DependencyInjection\Compiler\AmazonClientPass;
 use OneToMany\StorageBundle\Factory\ClientFactory;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
-use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_locator;
 
@@ -98,6 +95,4 @@ class StorageBundle extends AbstractBundle
                     ->arg('$customUrl', $config['mock_client']['custom_url'] ?? $config['custom_url'])
         ;
     }
-
-
 }

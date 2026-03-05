@@ -25,8 +25,7 @@ class AmazonClient extends BaseClient
         private S3ClientInterface $s3Client,
         string $bucket,
         ?string $customUrl,
-    )
-    {
+    ) {
         parent::__construct($bucket, $customUrl);
     }
 
