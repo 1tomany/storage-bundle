@@ -28,9 +28,14 @@ onetomany_storage:
     bucket: "storage-bucket"
     custom_url: ~
 
-when@test:
-    onetomany_storage:
-        client: "mock"
+    amazon_client:
+        bucket: "amazon-bucket"
+        custom_url: "https://dev.app-cdn.com"
+        s3_client: "s3_client_service_id"
+
+    mock_client:
+        bucket: "mock-bucket"
+        custom_url: "https://mock.app-cdn.com"
 ```
 
 #### `onetomany_storage.client`
@@ -52,13 +57,13 @@ The URL used to reference the uploaded file instead of the canonical URL returne
 
 ```yaml
 onetomany_storage:
-    custom_url: "https://my-files.my-custom-cdn.com"
+    custom_url: "https://files.app-cdn.com"
 ```
 
 When set, if an object with the key `users/10/files/avatar.png` was uploaded, the following URL would be returned:
 
 ```
-https://my-files.my-custom-cdn.com/users/10/files/avatar.png
+https://files.app-cdn.com/users/10/files/avatar.png
 ```
 
 ### Configuring Amazon S3
