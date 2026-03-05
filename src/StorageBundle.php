@@ -90,6 +90,8 @@ class StorageBundle extends AbstractBundle
     }
 
     /**
+     * @see Symfony\Component\DependencyInjection\Extension\ConfigurableExtensionInterface
+     *
      * @param array{
      *   client: non-empty-string,
      *   bucket: non-empty-string,
