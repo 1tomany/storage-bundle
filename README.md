@@ -33,26 +33,6 @@ when@test:
         client: "mock"
 ```
 
-### Updating `.env` and `.env.test`
-
-This bundle does not have a Symfony Flex recipe yet, so you'll have to manually update your `.env` file by adding the following section:
-
-```env
-###> 1tomany/storage-bundle ###
-STORAGE_SERVICE="s3"
-STORAGE_BUCKET="my-bucket-name"
-STORAGE_CUSTOM_URL="https://my-custom-cdn.com"
-###< 1tomany/storage-bundle ###
-```
-
-And update the `.env.test` file by adding the following section:
-
-```env
-###> 1tomany/storage-bundle ###
-STORAGE_SERVICE="mock"
-###< 1tomany/storage-bundle ###
-```
-
 #### `onetomany_storage.client`
 
 The storage client to use. Possible values are:
