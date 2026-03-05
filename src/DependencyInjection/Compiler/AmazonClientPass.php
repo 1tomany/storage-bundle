@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+use function is_a;
 use function sprintf;
 
 class AmazonClientPass implements CompilerPassInterface
@@ -47,7 +48,7 @@ class AmazonClientPass implements CompilerPassInterface
             throw new InvalidArgumentException(sprintf('The "$s3Client" argument required by "%s::__construct()" must reference a class.', AmazonClient::class));
         }
 
-        if (!\is_a($s3ClientArgClass, S3ClientInterface::class, true)) {
+        if (!is_a($s3ClientArgClass, S3ClientInterface::class, true)) {
             throw new InvalidArgumentException(sprintf('The "$s3Client" argument required by "%s::__construct()" must be an instance of "%s", "%s" provided.', AmazonClient::class, S3ClientInterface::class, $s3ClientArgClass));
         }
     }
