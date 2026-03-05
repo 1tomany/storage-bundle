@@ -2,6 +2,9 @@
 
 namespace OneToMany\StorageBundle;
 
+use OneToMany\StorageBundle\Client\Amazon\AmazonClient;
+use OneToMany\StorageBundle\Client\Mock\MockClient;
+use OneToMany\StorageBundle\Factory\ClientFactory;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -32,8 +35,24 @@ class StorageBundle extends AbstractBundle
     {
         $container->import('../config/services.php');
 
-        // if ($builder->hasDefinition()) {
+        if ($builder->hasDefinition(ClientFactory::class)) {
+            $builder
+                ->getDefinition(ClientFactory::class)
+                ->setArgument('$service', $config['client']);
+        }
 
-        // }
+        if ($builder->hasDefinition(AmazonClient::class)) {
+            $builder
+                ->getDefinition(AmazonClient::class)
+                ->setArgument('$bucket', $config['bucket'])
+                ->setArgument('$customUrl', $config['custom_url']);
+        }
+
+        if ($builder->hasDefinition(MockClient::class)) {
+            $builder
+                ->getDefinition(MockClient::class)
+                ->setArgument('$bucket', $config['bucket'])
+                ->setArgument('$customUrl', $config['custom_url']);
+        }
     }
 }
