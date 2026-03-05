@@ -18,6 +18,21 @@ composer require aws/aws-sdk-php-symfony
 
 Going forward, any mention of Amazon S3 or AWS assumes you're using Amazon S3 itself or a compatible provider.
 
+## Configuration
+
+Below is the complete configuration for this bundle. To customize it for your Symfony application, create a file named `onetomany_storage.yaml` in `config/packages/` and make the necessary changes.
+
+```yaml
+onetomany_storage:
+    client: "amazon"
+    bucket: "remote-bucket"
+    custom_url: ~
+
+when@test:
+    onetomany_storage:
+        client: "mock"
+```
+
 ### Updating `.env` and `.env.test`
 
 This bundle does not have a Symfony Flex recipe yet, so you'll have to manually update your `.env` file by adding the following section:
@@ -38,25 +53,26 @@ STORAGE_SERVICE="mock"
 ###< 1tomany/storage-bundle ###
 ```
 
-#### `STORAGE_SERVICE`
+#### `onetomany_storage.client`
 
-The storage provider to use. Possible values are:
+The storage client to use. Possible values are:
 
-- `s3` Amazon S3 compatible client
-- `mock` A mock client for testing
+- `"amazon"` Amazon S3 compatible client
+- `"mock"` A mock client for testing
 
-These values correspond to the `key` for each service with the tag `1tomany.storage_client`. You can add your own client by implementing the `ClientInterface` and tagging it with the tag `1tomany.storage_client` and a `key` value other than the ones above.
+These values correspond to the `key` for each service with the tag `onetomany.storage.client`. You can add your own client by implementing the `OneToMany\StorageBundle\Contract\Client\ClientInterface` interface and tagging it with the tag `onetomany.storage.client` and a `key` value other than the ones above.
 
-#### `STORAGE_BUCKET`
+#### `onetomany_storage.client`
 
 The bucket where files will be uploaded.
 
-#### `STORAGE_CUSTOM_URL`
+#### `onetomany_storage.custom_url`
 
 The URL used to reference the uploaded file instead of the canonical URL returned by the storage service. Set this value if you use Amazon CloudFront or a public Cloudflare R2 bucket domain to get a publicly accessible file URL:
 
-```env
-STORAGE_CUSTOM_URL="https://my-files.my-custom-cdn.com"
+```yaml
+onetomany_storage:
+    custom_url: "https://my-files.my-custom-cdn.com"
 ```
 
 When set, if an object with the key `users/10/files/avatar.png` was uploaded, the following URL would be returned:
@@ -108,7 +124,7 @@ aws:
 
 ## Using actions
 
-This bundle registers a factory in the the Symfony container that will create a storage client object. Each storage client class implements a common interface: `OneToMany\StorageBundle\Contract\Client\ClientInterface`. When an object of this type is injected into a class, the Symfony container will create the concrete storage provider service object defined by the `STORAGE_SERVICE` environment variable.
+This bundle registers a factory in the the Symfony container that will create a storage client object. Each storage client class implements a common interface: `OneToMany\StorageBundle\Contract\Client\ClientInterface`. When an object of this type is injected into a class, the Symfony container will create the client object defined by the value stored in the `onetomany_storage.client` property.
 
 ```php
 <?php
@@ -132,13 +148,13 @@ final readonly class UploadFileHandler
 }
 ```
 
-However, I **do not** recommend using an instance of the `ClientInterface` interface directly. Instead, you should use an action class. There are three action interfaces:
+However, I **do not** recommend using an instance of the `OneToMany\StorageBundle\Contract\Client\ClientInterface` interface directly. Instead, you should use an action class. There are three action interfaces:
 
 - `OneToMany\StorageBundle\Contract\Action\DeleteActionInterface`
 - `OneToMany\StorageBundle\Contract\Action\DownloadActionInterface`
 - `OneToMany\StorageBundle\Contract\Action\UploadActionInterface`
 
-Each of these expose a single public function, `act()`, which calls the actual `ClientInterface` method to perform the action requested.
+Each of these expose a single public function, `act()`, which calls the underlying `OneToMany\StorageBundle\Contract\Client\ClientInterface` method to perform the action requested.
 
 The code above would be rewritten as follows:
 
@@ -168,9 +184,9 @@ final readonly class UploadFileHandler
 
 The difference is subtle, but I prefer using the action classes for a few reasons:
 
-1. The interface name indicates the action being performed. By injecting an object of type `UploadActionInterface`, it's clear that you intend for this service to upload a file.
+1. The interface name indicates the action being performed. By injecting an object of type `OneToMany\StorageBundle\Contract\Action\UploadActionInterface`, it's clear that you intend for this service to upload a file.
 2. Any non-client-specific pre or post-processing can be handled in the `act()` method rather than reimplementing it in each storage client class.
-3. They can be mocked in tests easier. Because a concrete object is being injected, only the `act()` method needs to be mocked. Mocking (or creating an anonymous class of) the `ClientInterface` is more difficult and often overkill for a test that's only testing one action.
+3. They can be mocked in tests easier. Because a concrete object is being injected, only the `act()` method needs to be mocked. Mocking (or creating an anonymous class of) the `OneToMany\StorageBundle\Contract\Client\ClientInterface` is more difficult and often overkill for a test that's only testing one action.
 
 ## Credits
 
