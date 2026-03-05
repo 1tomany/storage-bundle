@@ -18,6 +18,7 @@ class DownloadRequest
     private string $directory;
 
     public const string DEFAULT_KEY = '__unknown_key__';
+    public const string PREFIX = '__onetomany__storage_';
 
     public function __construct(
         string $key,

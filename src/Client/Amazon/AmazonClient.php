@@ -6,12 +6,14 @@ use Aws\S3\S3Client;
 use OneToMany\StorageBundle\Client\BaseClient;
 use OneToMany\StorageBundle\Contract\Request\DeleteFileRequestInterface;
 use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
-use OneToMany\StorageBundle\Contract\Request\UploadFileRequestInterface;
 use OneToMany\StorageBundle\Contract\Response\DeletedFileResponseInterface;
 use OneToMany\StorageBundle\Contract\Response\DownloadedFileResponseInterface;
 use OneToMany\StorageBundle\Contract\Response\UploadedFileResponseInterface;
 use OneToMany\StorageBundle\Exception\InvalidArgumentException;
 use OneToMany\StorageBundle\Exception\RuntimeException;
+use OneToMany\StorageBundle\Request\DeleteRequest;
+use OneToMany\StorageBundle\Request\DownloadRequest;
+use OneToMany\StorageBundle\Request\UploadRequest;
 use OneToMany\StorageBundle\Response\DeletedFileResponse;
 use OneToMany\StorageBundle\Response\DownloadedFileResponse;
 use OneToMany\StorageBundle\Response\UploadedFileResponse;
@@ -21,13 +23,12 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 use function class_exists;
-use function file_exists;
 use function is_readable;
 use function is_string;
 use function is_writable;
 use function sprintf;
 
-class S3StorageClient extends BaseClient
+class AmazonClient extends BaseClient
 {
     /** @disregard P1009 Undefined type */
     public function __construct(
@@ -43,23 +44,26 @@ class S3StorageClient extends BaseClient
         parent::__construct($bucket, $customUrl);
     }
 
-    public function upload(UploadFileRequestInterface $request): UploadedFileResponseInterface
+    /**
+     * @see OneToMany\StorageBundle\Contract\Client\StorageClientInterface
+     */
+    public function upload(UploadRequest $request): UploadedFileResponseInterface
     {
-        if (!file_exists($request->getPath()) || !is_readable($request->getPath())) {
+        if (!\is_file($request->getPath()) || !is_readable($request->getPath())) {
             throw new InvalidArgumentException(sprintf('Uploading the file "%s" failed because the file does not exist or is not readable.', $request->getPath()));
         }
 
         try {
-            $resolveACL = function (UploadFileRequestInterface $request): string {
+            $resolveAcl = function (UploadRequest $request): string {
                 return $request->isPublic() ? 'public-read' : 'private';
             };
 
             $result = $this->s3Client->putObject([
                 'Bucket' => $this->getBucket(),
                 'Key' => $request->getKey(),
-                'ACL' => $resolveACL($request),
+                'ACL' => $resolveAcl($request),
                 'SourceFile' => $request->getPath(),
-                'Content-Type' => $request->getMimeType(),
+                'Content-Type' => $request->getFormat(),
             ]);
 
             $url = $result->get('ObjectURL'); // @phpstan-ignore-line
@@ -76,9 +80,12 @@ class S3StorageClient extends BaseClient
         return new UploadedFileResponse($url);
     }
 
-    public function download(DownloadFileRequestInterface $request): DownloadedFileResponseInterface
+    /**
+     * @see OneToMany\StorageBundle\Contract\Client\StorageClientInterface
+     */
+    public function download(DownloadRequest $request): DownloadedFileResponseInterface
     {
-        if (!is_writable($request->getDirectory())) {
+        if (!\is_dir($request->getDirectory()) || !is_writable($request->getDirectory())) {
             throw new InvalidArgumentException(sprintf('Downloading the file "%s" failed because the directory "%s" is not writable.', $request->getKey(), $request->getDirectory()));
         }
 
@@ -99,33 +106,32 @@ class S3StorageClient extends BaseClient
             throw new RuntimeException(sprintf('Downloading the file "%s" failed.', $request->getKey()), previous: $e);
         }
 
+        // Resolve the extension for the temporary file
+        $ext = Path::getExtension($request->getKey(), true);
+
         try {
-            // Resolve the extension for the temporary file
-            $extension = Path::getExtension($request->getKey(), true);
-
-            if (false === empty($extension)) {
-                $extension = ".{$extension}";
-            }
-
-            $filePath = $filesystem->tempnam($request->getDirectory(), $request::PREFIX, $extension);
+            $path = $filesystem->tempnam($request->getDirectory(), $request::PREFIX, $ext ?: ".{$ext}");
         } catch (FilesystemExceptionInterface $e) {
-            throw new RuntimeException(sprintf('Downloading the file "%s" failed because a temporary file could not be created on the filesystem.', $request->getKey()), previous: $e);
+            throw new RuntimeException(sprintf('Downloading the file "%s" failed because a temporary file could not be created.', $request->getKey()), previous: $e);
         }
 
         try {
-            $filesystem->dumpFile($filePath, $body->getContents());
+            $filesystem->dumpFile($path, $body->getContents());
         } catch (FilesystemExceptionInterface $e) {
-            if ($filesystem->exists($filePath)) {
-                $filesystem->remove($filePath);
+            if ($filesystem->exists($path)) {
+                $filesystem->remove($path);
             }
 
-            throw new RuntimeException(sprintf('Downloading the file "%s" failed because the file contents could not be written to "%s".', $request->getKey(), $filePath), previous: $e);
+            throw new RuntimeException(sprintf('Downloading the file "%s" failed because the file contents could not be written to "%s".', $request->getKey(), $path), previous: $e);
         }
 
-        return new DownloadedFileResponse($filePath);
+        return new DownloadedFileResponse($path);
     }
 
-    public function delete(DeleteFileRequestInterface $request): DeletedFileResponseInterface
+    /**
+     * @see OneToMany\StorageBundle\Contract\Client\StorageClientInterface
+     */
+    public function delete(DeleteRequest $request): DeletedFileResponseInterface
     {
         try {
             $this->s3Client->deleteObject([
