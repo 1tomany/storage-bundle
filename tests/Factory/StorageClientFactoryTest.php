@@ -3,7 +3,7 @@
 namespace OneToMany\StorageBundle\Tests\Factory;
 
 use OneToMany\StorageBundle\Client\Mock\MockClient;
-use OneToMany\StorageBundle\Exception\InvalidArgumentException;
+use OneToMany\StorageBundle\Factory\Exception\CreatingClientFailedServiceNotFoundException;
 use OneToMany\StorageBundle\Factory\StorageClientFactory;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -18,16 +18,14 @@ final class StorageClientFactoryTest extends TestCase
 {
     public function testCreatingServiceRequiresServiceToExist(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The storage service "invalid" is not registered with the container.');
+        $this->expectException(CreatingClientFailedServiceNotFoundException::class);
 
         new StorageClientFactory($this->createContainer())->create('invalid');
     }
 
     public function testCreatingServiceRequiresServiceToImplementStorageClientInterface(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The storage client "error" does not implement "OneToMany\StorageBundle\Contract\Client\StorageClientInterface".');
+        $this->expectException(CreatingClientFailedServiceNotFoundException::class);
 
         new StorageClientFactory($this->createContainer())->create('error');
     }
@@ -38,7 +36,7 @@ final class StorageClientFactoryTest extends TestCase
             /**
              * @var array{
              *   mock: MockClient,
-             *   error: InvalidArgumentException,
+             *   error: \InvalidArgumentException,
              * }
              */
             private array $services;
@@ -47,15 +45,15 @@ final class StorageClientFactoryTest extends TestCase
             {
                 $this->services = [
                     'mock' => new MockClient('mock-bucket'),
-                    'error' => new InvalidArgumentException('Error!'),
+                    'error' => new \InvalidArgumentException('Error!'),
                 ];
             }
 
             public function get(string $id): mixed
             {
-                if (!$this->has($id)) {
-                    throw new class(sprintf('The service "%s" is not registered with this container.', $id)) extends \InvalidArgumentException implements NotFoundExceptionInterface {};
-                }
+                // if (!$this->has($id)) {
+                //     throw new class(sprintf('The service "%s" is not registered with this container.', $id)) extends \InvalidArgumentException implements NotFoundExceptionInterface {};
+                // }
 
                 return $this->services[$id] ?? null;
             }

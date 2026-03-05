@@ -29,7 +29,7 @@ final class MockClientTest extends TestCase
             'request' => $this->createUploadRequest(),
         ]);
 
-        $this->assertEquals('https://mock-storage.service/mock-bucket/php-logo.png', $response->getUrl());
+        $this->assertEquals('https://mock-storage.service/mock-bucket/label.jpeg', $response->getUrl());
     }
 
     public function testUploadingFileWithCustomUrl(): void
@@ -38,7 +38,7 @@ final class MockClientTest extends TestCase
             'request' => $this->createUploadRequest(),
         ]);
 
-        $this->assertEquals('https://custom-cdn.com/php-logo.png', $response->getUrl());
+        $this->assertEquals('https://custom-cdn.com/label.jpeg', $response->getUrl());
     }
 
     private function createStorageClient(string $bucket = 'mock-bucket', ?string $customUrl = null): MockClient
