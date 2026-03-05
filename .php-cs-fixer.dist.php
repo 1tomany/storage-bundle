@@ -8,7 +8,9 @@ $finder = new Finder();
 
 $finder->in([
     './',
+    './config',
     './src/',
+    './tests/',
 ]);
 
 $finder->exclude([

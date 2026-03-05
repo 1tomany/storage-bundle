@@ -22,10 +22,18 @@ class StorageBundle extends AbstractBundle
     }
 
     /**
-     * @param array<string, mixed> $config
+     * @param array{
+     *   client: non-empty-string,
+     *   bucket: non-empty-string,
+     *   custom_url: ?non-empty-string,
+     * } $config
      */
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
         $container->import('../config/services.php');
+
+        // if ($builder->hasDefinition()) {
+
+        // }
     }
 }
