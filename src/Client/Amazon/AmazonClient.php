@@ -37,7 +37,7 @@ class AmazonClient extends BaseClient
     }
 
     /**
-     * @see OneToMany\StorageBundle\Contract\Client\StorageClientInterface
+     * @see OneToMany\StorageBundle\Contract\Client\ClientInterface
      */
     public function upload(UploadRequest $request): UploadResponse
     {
@@ -69,7 +69,7 @@ class AmazonClient extends BaseClient
     }
 
     /**
-     * @see OneToMany\StorageBundle\Contract\Client\StorageClientInterface
+     * @see OneToMany\StorageBundle\Contract\Client\ClientInterface
      */
     public function download(DownloadRequest $request): DownloadResponse
     {
@@ -113,7 +113,7 @@ class AmazonClient extends BaseClient
     }
 
     /**
-     * @see OneToMany\StorageBundle\Contract\Client\StorageClientInterface
+     * @see OneToMany\StorageBundle\Contract\Client\ClientInterface
      */
     public function delete(DeleteRequest $request): DeleteResponse
     {

@@ -16,7 +16,7 @@ use function vsprintf;
 class MockClient extends BaseClient
 {
     /**
-     * @see OneToMany\StorageBundle\Contract\Client\StorageClientInterface
+     * @see OneToMany\StorageBundle\Contract\Client\ClientInterface
      */
     public function upload(UploadRequest $request): UploadResponse
     {
@@ -28,7 +28,7 @@ class MockClient extends BaseClient
     }
 
     /**
-     * @see OneToMany\StorageBundle\Contract\Client\StorageClientInterface
+     * @see OneToMany\StorageBundle\Contract\Client\ClientInterface
      */
     public function download(DownloadRequest $request): DownloadResponse
     {
@@ -36,7 +36,7 @@ class MockClient extends BaseClient
     }
 
     /**
-     * @see OneToMany\StorageBundle\Contract\Client\StorageClientInterface
+     * @see OneToMany\StorageBundle\Contract\Client\ClientInterface
      */
     public function delete(DeleteRequest $request): DeleteResponse
     {

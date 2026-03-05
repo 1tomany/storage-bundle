@@ -9,7 +9,7 @@ use OneToMany\StorageBundle\Response\DeleteResponse;
 use OneToMany\StorageBundle\Response\DownloadResponse;
 use OneToMany\StorageBundle\Response\UploadResponse;
 
-interface StorageClientInterface
+interface ClientInterface
 {
     /**
      * @return non-empty-string

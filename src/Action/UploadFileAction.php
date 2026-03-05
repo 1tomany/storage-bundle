@@ -3,13 +3,13 @@
 namespace OneToMany\StorageBundle\Action;
 
 use OneToMany\StorageBundle\Contract\Action\UploadActionInterface;
-use OneToMany\StorageBundle\Contract\Client\StorageClientInterface;
+use OneToMany\StorageBundle\Contract\Client\ClientInterface;
 use OneToMany\StorageBundle\Request\UploadRequest;
 use OneToMany\StorageBundle\Response\UploadResponse;
 
 readonly class UploadFileAction implements UploadActionInterface
 {
-    public function __construct(private StorageClientInterface $client)
+    public function __construct(private ClientInterface $client)
     {
     }
 

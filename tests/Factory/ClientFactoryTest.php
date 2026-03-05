@@ -4,27 +4,27 @@ namespace OneToMany\StorageBundle\Tests\Factory;
 
 use OneToMany\StorageBundle\Client\Mock\MockClient;
 use OneToMany\StorageBundle\Factory\Exception\CreatingClientFailedServiceNotFoundException;
-use OneToMany\StorageBundle\Factory\StorageClientFactory;
+use OneToMany\StorageBundle\Factory\ClientFactory;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
 #[Group('UnitTests')]
 #[Group('FactoryTests')]
-final class StorageClientFactoryTest extends TestCase
+final class ClientFactoryTest extends TestCase
 {
     public function testCreatingServiceRequiresServiceToExist(): void
     {
         $this->expectException(CreatingClientFailedServiceNotFoundException::class);
 
-        new StorageClientFactory($this->createContainer())->create('invalid');
+        new ClientFactory($this->createContainer())->create('invalid');
     }
 
     public function testCreatingServiceRequiresServiceToImplementStorageClientInterface(): void
     {
         $this->expectException(CreatingClientFailedServiceNotFoundException::class);
 
-        new StorageClientFactory($this->createContainer())->create('error');
+        new ClientFactory($this->createContainer())->create('error');
     }
 
     private function createContainer(): ContainerInterface

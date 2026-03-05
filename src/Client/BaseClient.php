@@ -3,11 +3,11 @@
 namespace OneToMany\StorageBundle\Client;
 
 use OneToMany\StorageBundle\Client\Trait\GenerateUrlTrait;
-use OneToMany\StorageBundle\Contract\Client\StorageClientInterface;
+use OneToMany\StorageBundle\Contract\Client\ClientInterface;
 
 use function trim;
 
-abstract class BaseClient implements StorageClientInterface
+abstract class BaseClient implements ClientInterface
 {
     use GenerateUrlTrait;
 
@@ -35,7 +35,7 @@ abstract class BaseClient implements StorageClientInterface
     }
 
     /**
-     * @see OneToMany\StorageBundle\Contract\Client\StorageClientInterface
+     * @see OneToMany\StorageBundle\Contract\Client\ClientInterface
      */
     public function getBucket(): string
     {
@@ -50,7 +50,7 @@ abstract class BaseClient implements StorageClientInterface
     }
 
     /**
-     * @see OneToMany\StorageBundle\Contract\Client\StorageClientInterface
+     * @see OneToMany\StorageBundle\Contract\Client\ClientInterface
      */
     public function getCustomUrl(): ?string
     {
