@@ -13,7 +13,6 @@ $finder->in([
 ]);
 
 $finder->exclude([
-    'config',
     'vendor',
 ]);
 
@@ -29,13 +28,12 @@ $config->setRules([
         'import_constants' => true,
         'import_functions' => true,
     ],
+    'operator_linebreak' => [
+        'only_booleans' => true,
+        'position' => 'end',
+    ],
     'phpdoc_align' => [
         'align' => 'left',
-    ],
-    'phpdoc_to_comment' => [
-        'ignored_tags' => [
-            'disregard',
-        ],
     ],
 ]);
 
