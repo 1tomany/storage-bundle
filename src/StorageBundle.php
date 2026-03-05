@@ -8,6 +8,8 @@ use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
 class StorageBundle extends AbstractBundle
 {
+    protected string $extensionAlias = 'onetomany_storage';
+
     /**
      * @param array<string, mixed> $config
      */
