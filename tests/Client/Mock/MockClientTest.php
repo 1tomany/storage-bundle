@@ -48,6 +48,6 @@ final class MockClientTest extends TestCase
 
     private function createUploadRequest(): UploadRequest
     {
-        return new UploadRequest(__DIR__.'/../.data/label.jpeg', 'image/jpeg', 'label.jpeg');
+        return new UploadRequest(__DIR__.'/../../.data/label.jpeg', 'image/jpeg', 'label.jpeg');
     }
 }
