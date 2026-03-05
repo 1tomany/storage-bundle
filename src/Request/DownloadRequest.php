@@ -26,8 +26,7 @@ class DownloadRequest implements DownloadFileRequestInterface
     public function __construct(
         string $key,
         ?string $directory = null,
-    )
-    {
+    ) {
         $this->usingKey($key);
         $this->toDirectory($directory);
     }
