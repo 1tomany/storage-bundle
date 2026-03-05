@@ -7,7 +7,7 @@ use OneToMany\StorageBundle\Contract\Client\StorageClientInterface;
 
 use function trim;
 
-abstract class AbstractStorageClient implements StorageClientInterface
+abstract class BaseClient implements StorageClientInterface
 {
     use GenerateUrlTrait;
 

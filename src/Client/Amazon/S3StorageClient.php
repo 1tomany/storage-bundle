@@ -3,7 +3,7 @@
 namespace OneToMany\StorageBundle\Client\Amazon;
 
 use Aws\S3\S3Client;
-use OneToMany\StorageBundle\Client\AbstractStorageClient;
+use OneToMany\StorageBundle\Client\BaseClient;
 use OneToMany\StorageBundle\Contract\Request\DeleteFileRequestInterface;
 use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
 use OneToMany\StorageBundle\Contract\Request\UploadFileRequestInterface;
@@ -27,7 +27,7 @@ use function is_string;
 use function is_writable;
 use function sprintf;
 
-class S3StorageClient extends AbstractStorageClient
+class S3StorageClient extends BaseClient
 {
     /** @disregard P1009 Undefined type */
     public function __construct(

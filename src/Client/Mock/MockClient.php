@@ -2,22 +2,25 @@
 
 namespace OneToMany\StorageBundle\Client\Mock;
 
-use OneToMany\StorageBundle\Client\AbstractStorageClient;
-use OneToMany\StorageBundle\Contract\Request\DeleteFileRequestInterface;
-use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
-use OneToMany\StorageBundle\Contract\Request\UploadFileRequestInterface;
+use OneToMany\StorageBundle\Client\BaseClient;
 use OneToMany\StorageBundle\Contract\Response\DeletedFileResponseInterface;
 use OneToMany\StorageBundle\Contract\Response\DownloadedFileResponseInterface;
 use OneToMany\StorageBundle\Contract\Response\UploadedFileResponseInterface;
 use OneToMany\StorageBundle\Exception\RuntimeException;
+use OneToMany\StorageBundle\Request\DeleteRequest;
+use OneToMany\StorageBundle\Request\DownloadRequest;
+use OneToMany\StorageBundle\Request\UploadRequest;
 use OneToMany\StorageBundle\Response\DeletedFileResponse;
 use OneToMany\StorageBundle\Response\UploadedFileResponse;
 
 use function vsprintf;
 
-class MockStorageClient extends AbstractStorageClient
+class MockClient extends BaseClient
 {
-    public function upload(UploadFileRequestInterface $request): UploadedFileResponseInterface
+    /**
+     * @see OneToMany\StorageBundle\Contract\Client\StorageClientInterface
+     */
+    public function upload(UploadRequest $request): UploadedFileResponseInterface
     {
         $url = vsprintf('https://mock-storage.service/%s/%s', [
             $this->getBucket(), $request->getKey(),
@@ -26,12 +29,18 @@ class MockStorageClient extends AbstractStorageClient
         return new UploadedFileResponse($this->generateUrl($url, $this->getCustomUrl(), $request->getKey()));
     }
 
-    public function download(DownloadFileRequestInterface $request): DownloadedFileResponseInterface
+    /**
+     * @see OneToMany\StorageBundle\Contract\Client\StorageClientInterface
+     */
+    public function download(DownloadRequest $request): DownloadedFileResponseInterface
     {
         throw new RuntimeException('Not implemented!');
     }
 
-    public function delete(DeleteFileRequestInterface $request): DeletedFileResponseInterface
+    /**
+     * @see OneToMany\StorageBundle\Contract\Client\StorageClientInterface
+     */
+    public function delete(DeleteRequest $request): DeletedFileResponseInterface
     {
         return new DeletedFileResponse($request->getKey());
     }

@@ -2,7 +2,7 @@
 
 namespace OneToMany\StorageBundle\Tests\Factory;
 
-use OneToMany\StorageBundle\Client\Mock\MockStorageClient;
+use OneToMany\StorageBundle\Client\Mock\MockClient;
 use OneToMany\StorageBundle\Exception\InvalidArgumentException;
 use OneToMany\StorageBundle\Factory\StorageClientFactory;
 use PHPUnit\Framework\Attributes\Group;
@@ -37,7 +37,7 @@ final class StorageClientFactoryTest extends TestCase
         $container = new class implements ContainerInterface {
             /**
              * @var array{
-             *   mock: MockStorageClient,
+             *   mock: MockClient,
              *   error: InvalidArgumentException,
              * }
              */
@@ -46,7 +46,7 @@ final class StorageClientFactoryTest extends TestCase
             public function __construct()
             {
                 $this->services = [
-                    'mock' => new MockStorageClient('mock-bucket'),
+                    'mock' => new MockClient('mock-bucket'),
                     'error' => new InvalidArgumentException('Error!'),
                 ];
             }
