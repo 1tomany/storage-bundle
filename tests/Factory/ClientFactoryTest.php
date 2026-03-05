@@ -3,8 +3,8 @@
 namespace OneToMany\StorageBundle\Tests\Factory;
 
 use OneToMany\StorageBundle\Client\Mock\MockClient;
-use OneToMany\StorageBundle\Factory\Exception\CreatingClientFailedServiceNotFoundException;
 use OneToMany\StorageBundle\Factory\ClientFactory;
+use OneToMany\StorageBundle\Factory\Exception\CreatingClientFailedServiceNotFoundException;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
