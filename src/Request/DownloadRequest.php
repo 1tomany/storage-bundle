@@ -2,19 +2,15 @@
 
 namespace OneToMany\StorageBundle\Request;
 
-use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
 use OneToMany\StorageBundle\Exception\InvalidArgumentException;
-use OneToMany\StorageBundle\Trait\AssertNotEmptyTrait;
 
 use function is_dir;
 use function is_writable;
 use function sys_get_temp_dir;
 use function trim;
 
-class DownloadRequest implements DownloadFileRequestInterface
+class DownloadRequest
 {
-    use AssertNotEmptyTrait;
-
     /** @var non-empty-string */
     private string $key = self::DEFAULT_KEY;
 
