@@ -7,7 +7,7 @@ use OneToMany\StorageBundle\Contract\Client\ClientInterface;
 use OneToMany\StorageBundle\Request\UploadRequest;
 use OneToMany\StorageBundle\Response\UploadResponse;
 
-readonly class UploadFileAction implements UploadActionInterface
+readonly class UploadAction implements UploadActionInterface
 {
     public function __construct(private ClientInterface $client)
     {
