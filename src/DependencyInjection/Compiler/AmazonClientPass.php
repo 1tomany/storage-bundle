@@ -9,16 +9,23 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-use function is_a;
 use function sprintf;
 
 class AmazonClientPass implements CompilerPassInterface
 {
+    /**
+     * @see Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface
+     */
     public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition(AmazonClient::class)) {
             return;
         }
+
+        /** @var non-empty-list<array<non-empty-string, mixed>> $storageConfig */
+        $storageConfig = $container->getExtensionConfig('onetomany_storage');
+
+        print_r($storageConfig);
 
         $s3ClientArg = $container
             ->getDefinition(AmazonClient::class)
@@ -34,7 +41,7 @@ class AmazonClientPass implements CompilerPassInterface
             throw new InvalidArgumentException(sprintf('The service "%s" required by "%s" does not exist.', $s3ClientId, AmazonClient::class));
         }
 
-        if (!is_a($container->get($s3ClientId), S3ClientInterface::class)) {
+        if (!$container->get($s3ClientId) instanceof S3ClientInterface) {
             throw new InvalidArgumentException(sprintf('The service "%s" required by "%s" is not an instance of "%s". Try running "composer require aws/aws-sdk-php-symfony" to install the AWS SDK.', $s3ClientId, AmazonClient::class, S3ClientInterface::class));
         }
     }
