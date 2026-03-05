@@ -44,17 +44,9 @@
         }
     },
     "scripts": {
-        "pre-autoload-dump": [
-            "Aws\\Script\\Composer\\Composer::removeUnusedServices"
-        ],
         "fix": "./vendor/bin/php-cs-fixer fix",
         "stan": "./vendor/bin/phpstan",
         "test": "./vendor/bin/phpunit"
-    },
-    "extra": {
-        "aws/aws-sdk-php": [
-            "S3"
-        ]
     },
     "authors": [
         {
