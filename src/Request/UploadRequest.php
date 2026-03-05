@@ -4,6 +4,7 @@ namespace OneToMany\StorageBundle\Request;
 
 use OneToMany\StorageBundle\Request\Trait\ValidatePathTrait;
 
+use function basename;
 use function strtolower;
 use function trim;
 
@@ -91,7 +92,7 @@ class UploadRequest
     public function usingKey(?string $key): static
     {
         if (!$key = trim($key ?? '')) {
-            $key = \basename($this->path);
+            $key = basename($this->path);
         }
 
         $this->key = $key ?: self::DEFAULT_KEY;
