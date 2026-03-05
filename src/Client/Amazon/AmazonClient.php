@@ -4,8 +4,6 @@ namespace OneToMany\StorageBundle\Client\Amazon;
 
 use Aws\S3\S3Client;
 use OneToMany\StorageBundle\Client\BaseClient;
-use OneToMany\StorageBundle\Contract\Request\DeleteFileRequestInterface;
-use OneToMany\StorageBundle\Contract\Request\DownloadFileRequestInterface;
 use OneToMany\StorageBundle\Contract\Response\DeletedFileResponseInterface;
 use OneToMany\StorageBundle\Contract\Response\DownloadedFileResponseInterface;
 use OneToMany\StorageBundle\Contract\Response\UploadedFileResponseInterface;
@@ -23,6 +21,8 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
 use function class_exists;
+use function is_dir;
+use function is_file;
 use function is_readable;
 use function is_string;
 use function is_writable;
@@ -49,7 +49,7 @@ class AmazonClient extends BaseClient
      */
     public function upload(UploadRequest $request): UploadedFileResponseInterface
     {
-        if (!\is_file($request->getPath()) || !is_readable($request->getPath())) {
+        if (!is_file($request->getPath()) || !is_readable($request->getPath())) {
             throw new InvalidArgumentException(sprintf('Uploading the file "%s" failed because the file does not exist or is not readable.', $request->getPath()));
         }
 
@@ -85,7 +85,7 @@ class AmazonClient extends BaseClient
      */
     public function download(DownloadRequest $request): DownloadedFileResponseInterface
     {
-        if (!\is_dir($request->getDirectory()) || !is_writable($request->getDirectory())) {
+        if (!is_dir($request->getDirectory()) || !is_writable($request->getDirectory())) {
             throw new InvalidArgumentException(sprintf('Downloading the file "%s" failed because the directory "%s" is not writable.', $request->getKey(), $request->getDirectory()));
         }
 
