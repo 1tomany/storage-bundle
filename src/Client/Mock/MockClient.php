@@ -10,8 +10,8 @@ use OneToMany\StorageBundle\Exception\RuntimeException;
 use OneToMany\StorageBundle\Request\DeleteRequest;
 use OneToMany\StorageBundle\Request\DownloadRequest;
 use OneToMany\StorageBundle\Request\UploadRequest;
-use OneToMany\StorageBundle\Response\DeletedFileResponse;
-use OneToMany\StorageBundle\Response\UploadedFileResponse;
+use OneToMany\StorageBundle\Response\DeleteResponse;
+use OneToMany\StorageBundle\Response\UploadResponse;
 
 use function vsprintf;
 
@@ -26,7 +26,7 @@ class MockClient extends BaseClient
             $this->getBucket(), $request->getKey(),
         ]);
 
-        return new UploadedFileResponse($this->generateUrl($url, $this->getCustomUrl(), $request->getKey()));
+        return new UploadResponse($this->generateUrl($url, $this->getCustomUrl(), $request->getKey()));
     }
 
     /**
@@ -42,6 +42,6 @@ class MockClient extends BaseClient
      */
     public function delete(DeleteRequest $request): DeletedFileResponseInterface
     {
-        return new DeletedFileResponse($request->getKey());
+        return new DeleteResponse($request->getKey());
     }
 }

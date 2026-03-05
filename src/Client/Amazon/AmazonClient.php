@@ -12,9 +12,9 @@ use OneToMany\StorageBundle\Exception\RuntimeException;
 use OneToMany\StorageBundle\Request\DeleteRequest;
 use OneToMany\StorageBundle\Request\DownloadRequest;
 use OneToMany\StorageBundle\Request\UploadRequest;
-use OneToMany\StorageBundle\Response\DeletedFileResponse;
-use OneToMany\StorageBundle\Response\DownloadedFileResponse;
-use OneToMany\StorageBundle\Response\UploadedFileResponse;
+use OneToMany\StorageBundle\Response\DeleteResponse;
+use OneToMany\StorageBundle\Response\DownloadResponse;
+use OneToMany\StorageBundle\Response\UploadResponse;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Filesystem\Exception\ExceptionInterface as FilesystemExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -77,7 +77,7 @@ class AmazonClient extends BaseClient
 
         $url = $this->generateUrl($url, $this->getCustomUrl(), $request->getKey());
 
-        return new UploadedFileResponse($url);
+        return new UploadResponse($url);
     }
 
     /**
@@ -125,7 +125,7 @@ class AmazonClient extends BaseClient
             throw new RuntimeException(sprintf('Downloading the file "%s" failed because the file contents could not be written to "%s".', $request->getKey(), $path), previous: $e);
         }
 
-        return new DownloadedFileResponse($path);
+        return new DownloadResponse($path);
     }
 
     /**
@@ -142,6 +142,6 @@ class AmazonClient extends BaseClient
             throw new RuntimeException(sprintf('Deleting the file "%s" failed.', $request->getKey()), previous: $e);
         }
 
-        return new DeletedFileResponse($request->getKey());
+        return new DeleteResponse($request->getKey());
     }
 }
