@@ -2,7 +2,7 @@
 
 namespace OneToMany\StorageBundle\Client\Amazon;
 
-use Aws\S3\S3Client;
+use Aws\S3\S3ClientInterface;
 use OneToMany\StorageBundle\Client\BaseClient;
 use OneToMany\StorageBundle\Exception\RuntimeException;
 use OneToMany\StorageBundle\Request\DeleteRequest;
@@ -16,23 +16,17 @@ use Symfony\Component\Filesystem\Exception\ExceptionInterface as FilesystemExcep
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
-use function class_exists;
 use function is_string;
 use function sprintf;
 
 class AmazonClient extends BaseClient
 {
-    /** @disregard P1009 Undefined type */
     public function __construct(
-        private S3Client $s3Client, // @phpstan-ignore-line
+        private S3ClientInterface $s3Client,
         string $bucket,
         ?string $customUrl,
-    ) {
-        /** @disregard P1009 Undefined type */
-        if (!class_exists(S3Client::class)) {
-            throw new RuntimeException('This storage client can not be used because the AWS SDK is not installed. Try running "composer require aws/aws-sdk-php-symfony".');
-        }
-
+    )
+    {
         parent::__construct($bucket, $customUrl);
     }
 
@@ -54,7 +48,7 @@ class AmazonClient extends BaseClient
                 'Content-Type' => $request->getFormat(),
             ]);
 
-            $url = $result->get('ObjectURL'); // @phpstan-ignore-line
+            $url = $result->get('ObjectURL');
         } catch (\Exception $e) {
             throw new RuntimeException(sprintf('Uploading the file "%s" to "%s" failed.', $request->getPath(), $request->getKey()), previous: $e);
         }
@@ -81,7 +75,7 @@ class AmazonClient extends BaseClient
                 'Key' => $request->getKey(),
             ]);
 
-            $body = $file->get('Body'); // @phpstan-ignore-line
+            $body = $file->get('Body');
 
             if (!$body instanceof StreamInterface) {
                 throw new RuntimeException(sprintf('Downloading the file "%s" failed because the remote server failed to stream the contents.', $request->getKey()));
