@@ -11,10 +11,28 @@ class UploadRequest
 {
     use ValidatePathTrait;
 
+    /**
+     * @var non-empty-string
+     */
+    private string $path;
+
+    /**
+     * @var non-empty-lowercase-string
+     */
+    private string $format = self::DEFAULT_FORMAT;
+
+    /**
+     * @var non-empty-string
+     */
+    private string $key = self::DEFAULT_KEY;
+
+    public const string DEFAULT_FORMAT = 'application/octet-stream';
+    public const string DEFAULT_KEY = '__unknown_key__';
+
     public function __construct(
-        private string $path,
-        private string $format,
-        private string $key,
+        string $path,
+        ?string $format = null,
+        ?string $key = null,
         private bool $isPublic = true,
     ) {
         $this->atPath($path);
@@ -39,31 +57,44 @@ class UploadRequest
         return $this;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getPath(): string
     {
         return $this->path;
     }
 
+    /**
+     * @return non-empty-lowercase-string
+     */
     public function getFormat(): string
     {
         return $this->format;
     }
 
-    public function asFormat(string $format): static
+    public function asFormat(?string $format): static
     {
-        $this->format = strtolower(trim($format));
+        $this->format = strtolower(trim($format ?? '')) ?: 'application/octet-stream';
 
         return $this;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getKey(): string
     {
         return $this->key;
     }
 
-    public function usingKey(string $key): static
+    public function usingKey(?string $key): static
     {
-        $this->key = trim($key);
+        if (!$key = trim($key ?? '')) {
+            $key = \basename($this->path);
+        }
+
+        $this->key = $key ?: self::DEFAULT_KEY;
 
         return $this;
     }

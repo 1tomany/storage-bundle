@@ -5,13 +5,13 @@ namespace OneToMany\StorageBundle\Tests\Client\Mock;
 use OneToMany\StorageBundle\Client\Mock\MockStorageClient;
 use OneToMany\StorageBundle\Exception\RuntimeException;
 use OneToMany\StorageBundle\Request\DownloadFileRequest;
-use OneToMany\StorageBundle\Request\UploadFileRequest;
+use OneToMany\StorageBundle\Request\UploadRequest;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 #[Group('UnitTests')]
 #[Group('ClientTests')]
-final class MockStorageClientTest extends TestCase
+final class MockClientTest extends TestCase
 {
     public function testDownloadingFileIsNotImplemented(): void
     {
@@ -23,7 +23,7 @@ final class MockStorageClientTest extends TestCase
 
     public function testUploadingFileWithoutCustomUrl(): void
     {
-        $uploadFileRequest = new UploadFileRequest('php-logo.png', 'image/png', 'php-logo.png');
+        $uploadFileRequest = new UploadRequest(__DIR__.'/../.data/label.jpeg', 'image/jpeg', 'label.jpeg');
 
         $record = $this->createStorageClient()->upload(...[
             'request' => $uploadFileRequest,
@@ -34,10 +34,10 @@ final class MockStorageClientTest extends TestCase
 
     public function testUploadingFileWithCustomUrl(): void
     {
-        $uploadFileRequest = new UploadFileRequest('php-logo.png', 'image/png', 'php-logo.png');
+        $uploadRequest = new UploadRequest(__DIR__.'/../.data/label.jpeg', 'image/jpeg', 'label.jpeg');
 
         $record = $this->createStorageClient(customUrl: 'https://custom-cdn.com')->upload(...[
-            'request' => $uploadFileRequest,
+            'request' => $uploadRequest,
         ]);
 
         $this->assertEquals('https://custom-cdn.com/php-logo.png', $record->getUrl());
