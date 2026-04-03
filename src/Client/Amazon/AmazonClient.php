@@ -133,7 +133,7 @@ class AmazonClient extends BaseClient
         $ext = Path::getExtension($request->getKey(), true);
 
         try {
-            $path = $filesystem->tempnam($request->getDirectory(), $request::PREFIX, $ext ?: ".{$ext}");
+            $path = $filesystem->tempnam($request->getDirectory(), $request::FILE_PREFIX, $ext ?: ".{$ext}");
         } catch (FilesystemExceptionInterface $e) {
             throw new RuntimeException(sprintf('Downloading the file "%s" failed because a temporary file could not be created.', $request->getKey()), previous: $e);
         }

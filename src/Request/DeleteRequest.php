@@ -2,11 +2,12 @@
 
 namespace OneToMany\StorageBundle\Request;
 
+use OneToMany\StorageBundle\Contract\Request\RequestInterface;
 use OneToMany\StorageBundle\Exception\InvalidArgumentException;
 
 use function ltrim;
 
-class DeleteRequest
+class DeleteRequest implements RequestInterface
 {
     /**
      * @var non-empty-string

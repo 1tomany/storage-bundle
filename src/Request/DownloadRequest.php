@@ -2,6 +2,7 @@
 
 namespace OneToMany\StorageBundle\Request;
 
+use OneToMany\StorageBundle\Contract\Request\RequestInterface;
 use OneToMany\StorageBundle\Exception\InvalidArgumentException;
 
 use function is_dir;
@@ -10,7 +11,7 @@ use function sprintf;
 use function sys_get_temp_dir;
 use function trim;
 
-class DownloadRequest
+class DownloadRequest implements RequestInterface
 {
     /**
      * @var non-empty-string
@@ -21,8 +22,6 @@ class DownloadRequest
      * @var non-empty-string
      */
     private string $directory;
-
-    public const string PREFIX = '__onetomany__storage_';
 
     public function __construct(
         string $key,
@@ -40,6 +39,9 @@ class DownloadRequest
         return $this->key;
     }
 
+    /**
+     * @throws InvalidArgumentException when the trimmed key is empty
+     */
     public function withKey(?string $key): static
     {
         if (!$key = trim((string) $key)) {

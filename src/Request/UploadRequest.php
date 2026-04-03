@@ -2,13 +2,16 @@
 
 namespace OneToMany\StorageBundle\Request;
 
+use OneToMany\StorageBundle\Contract\Request\RequestInterface;
 use OneToMany\StorageBundle\Request\Trait\ValidatePathTrait;
 
 use function basename;
+use function bin2hex;
+use function random_bytes;
 use function strtolower;
 use function trim;
 
-class UploadRequest
+class UploadRequest implements RequestInterface
 {
     use ValidatePathTrait;
 
@@ -25,7 +28,7 @@ class UploadRequest
     /**
      * @var non-empty-string
      */
-    private string $key = self::DEFAULT_KEY;
+    private string $key;
 
     /**
      * The default file format.
@@ -33,13 +36,6 @@ class UploadRequest
      * @var non-empty-lowercase-string
      */
     public const string DEFAULT_FORMAT = 'application/octet-stream';
-
-    /**
-     * The default key when one is not provided.
-     *
-     * @var non-empty-lowercase-string
-     */
-    public const string DEFAULT_KEY = '__unknown_key__';
 
     public function __construct(
         string $path,
@@ -106,7 +102,7 @@ class UploadRequest
             $key = basename($this->path);
         }
 
-        $this->key = $key ?: self::DEFAULT_KEY;
+        $this->key = $key ?: self::FILE_PREFIX.bin2hex(random_bytes(6));
 
         return $this;
     }
