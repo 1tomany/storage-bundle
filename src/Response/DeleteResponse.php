@@ -9,8 +9,7 @@ final readonly class DeleteResponse
      */
     public function __construct(
         private string $key,
-    )
-    {
+    ) {
     }
 
     /**

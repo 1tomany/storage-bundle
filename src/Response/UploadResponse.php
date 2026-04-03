@@ -9,8 +9,7 @@ final readonly class UploadResponse
      */
     public function __construct(
         private string $url,
-    )
-    {
+    ) {
     }
 
     /**

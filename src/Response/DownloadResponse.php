@@ -9,8 +9,7 @@ final readonly class DownloadResponse
      */
     public function __construct(
         private string $path,
-    )
-    {
+    ) {
     }
 
     /**
