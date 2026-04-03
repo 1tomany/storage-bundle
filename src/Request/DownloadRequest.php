@@ -6,6 +6,7 @@ use OneToMany\StorageBundle\Exception\InvalidArgumentException;
 
 use function is_dir;
 use function is_writable;
+use function sprintf;
 use function sys_get_temp_dir;
 use function trim;
 
@@ -75,7 +76,7 @@ class DownloadRequest
         }
 
         if (!is_writable($directory)) {
-            throw new InvalidArgumentException(\sprintf('The directory "%s" is not writable.', $directory));
+            throw new InvalidArgumentException(sprintf('The directory "%s" is not writable.', $directory));
         }
 
         $this->directory = $directory;

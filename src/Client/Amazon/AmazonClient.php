@@ -20,10 +20,10 @@ use function array_keys;
 use function file_get_contents;
 use function hash;
 use function hash_hmac;
-use function parse_url;
 use function implode;
 use function is_string;
 use function ksort;
+use function parse_url;
 use function rtrim;
 use function sprintf;
 use function strtolower;
@@ -58,7 +58,7 @@ class AmazonClient extends BaseClient
 
             $payloadHash = hash('sha256', $body);
             $key = $request->getKey();
-            $uri = '/' . $key;
+            $uri = '/'.$key;
             $endpoint = $this->resolveEndpoint();
             $host = $this->resolveHost($endpoint);
             $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
@@ -73,7 +73,7 @@ class AmazonClient extends BaseClient
 
             $headers['Authorization'] = $this->signRequest('PUT', $uri, '', $headers, $payloadHash, $now);
 
-            $response = $this->httpClient->request('PUT', $endpoint . $uri, [
+            $response = $this->httpClient->request('PUT', $endpoint.$uri, [
                 'headers' => $headers,
                 'body' => $body,
             ]);
@@ -82,7 +82,7 @@ class AmazonClient extends BaseClient
                 throw new RuntimeException(sprintf('Uploading the file "%s" to "%s" failed with status code %d.', $request->getPath(), $key, $response->getStatusCode()));
             }
 
-            $url = $endpoint . $uri;
+            $url = $endpoint.$uri;
         } catch (RuntimeException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -101,7 +101,7 @@ class AmazonClient extends BaseClient
 
         try {
             $key = $request->getKey();
-            $uri = '/' . $key;
+            $uri = '/'.$key;
             $endpoint = $this->resolveEndpoint();
             $host = $this->resolveHost($endpoint);
             $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
@@ -114,7 +114,7 @@ class AmazonClient extends BaseClient
 
             $headers['Authorization'] = $this->signRequest('GET', $uri, '', $headers, self::EMPTY_PAYLOAD_HASH, $now);
 
-            $response = $this->httpClient->request('GET', $endpoint . $uri, [
+            $response = $this->httpClient->request('GET', $endpoint.$uri, [
                 'headers' => $headers,
             ]);
 
@@ -158,7 +158,7 @@ class AmazonClient extends BaseClient
     {
         try {
             $key = $request->getKey();
-            $uri = '/' . $key;
+            $uri = '/'.$key;
             $endpoint = $this->resolveEndpoint();
             $host = $this->resolveHost($endpoint);
             $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
@@ -171,7 +171,7 @@ class AmazonClient extends BaseClient
 
             $headers['Authorization'] = $this->signRequest('DELETE', $uri, '', $headers, self::EMPTY_PAYLOAD_HASH, $now);
 
-            $response = $this->httpClient->request('DELETE', $endpoint . $uri, [
+            $response = $this->httpClient->request('DELETE', $endpoint.$uri, [
                 'headers' => $headers,
             ]);
 
@@ -195,7 +195,7 @@ class AmazonClient extends BaseClient
         $endpoint = $this->configuration->getEndpoint();
 
         if (is_string($endpoint) && '' !== $endpoint) {
-            return rtrim($endpoint, '/') . '/' . $this->getBucket();
+            return rtrim($endpoint, '/').'/'.$this->getBucket();
         }
 
         $region = $this->configuration->getRegion();
@@ -233,14 +233,14 @@ class AmazonClient extends BaseClient
 
         foreach ($headers as $name => $value) {
             $lowered = strtolower($name);
-            $canonicalHeaders[$lowered] = $lowered . ':' . trim($value);
+            $canonicalHeaders[$lowered] = $lowered.':'.trim($value);
             $signedHeaderNames[$lowered] = true;
         }
 
         ksort($canonicalHeaders);
         ksort($signedHeaderNames);
 
-        $canonicalHeadersString = implode("\n", $canonicalHeaders) . "\n";
+        $canonicalHeadersString = implode("\n", $canonicalHeaders)."\n";
         $signedHeaders = implode(';', array_keys($signedHeaderNames));
 
         // Build canonical request
@@ -279,7 +279,7 @@ class AmazonClient extends BaseClient
 
     private function deriveSigningKey(string $date, string $region): string
     {
-        $dateKey = hash_hmac('sha256', $date, 'AWS4' . $this->configuration->getSecret(), true);
+        $dateKey = hash_hmac('sha256', $date, 'AWS4'.$this->configuration->getSecret(), true);
         $regionKey = hash_hmac('sha256', $region, $dateKey, true);
         $serviceKey = hash_hmac('sha256', self::SERVICE, $regionKey, true);
 
