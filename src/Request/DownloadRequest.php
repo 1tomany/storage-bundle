@@ -14,14 +14,13 @@ class DownloadRequest
     /**
      * @var non-empty-string
      */
-    private string $key = self::DEFAULT_KEY;
+    private string $key;
 
     /**
      * @var non-empty-string
      */
     private string $directory;
 
-    public const string DEFAULT_KEY = '__unknown_key__';
     public const string PREFIX = '__onetomany__storage_';
 
     public function __construct(
@@ -42,7 +41,11 @@ class DownloadRequest
 
     public function withKey(?string $key): static
     {
-        $this->key = trim((string) $key) ?: self::DEFAULT_KEY;
+        if (!$key = trim((string) $key)) {
+            throw new InvalidArgumentException('The key cannot be empty.');
+        }
+
+        $this->key = $key;
 
         return $this;
     }
@@ -55,16 +58,24 @@ class DownloadRequest
         return $this->directory;
     }
 
+    /**
+     * @throws InvalidArgumentException when the directory name is empty
+     * @throws InvalidArgumentException when the directory is not writable
+     */
     public function toDirectory(?string $directory): static
     {
-        $directory = trim($directory ?? '');
+        $directory = trim((string) $directory);
+
+        if ('' === $directory) {
+            throw new InvalidArgumentException('The directory name cannot be empty.');
+        }
 
         if (!is_dir($directory) || !is_writable($directory)) {
             $directory = sys_get_temp_dir();
         }
 
-        if ('' === $directory) {
-            throw new InvalidArgumentException('The directory cannot be empty.');
+        if (!is_writable($directory)) {
+            throw new InvalidArgumentException(\sprintf('The directory "%s" is not writable.', $directory));
         }
 
         $this->directory = $directory;
