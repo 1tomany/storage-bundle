@@ -12,16 +12,33 @@ class UploadRequest
 {
     use ValidatePathTrait;
 
-    /** @var non-empty-string */
+    /**
+     * @var non-empty-string
+     */
     private string $path;
 
-    /** @var non-empty-lowercase-string */
+    /**
+     * @var non-empty-lowercase-string
+     */
     private string $format = self::DEFAULT_FORMAT;
 
-    /** @var non-empty-string */
+    /**
+     * @var non-empty-string
+     */
     private string $key = self::DEFAULT_KEY;
 
+    /**
+     * The default file format.
+     *
+     * @var non-empty-lowercase-string
+     */
     public const string DEFAULT_FORMAT = 'application/octet-stream';
+
+    /**
+     * The default key when one is not provided.
+     *
+     * @var non-empty-lowercase-string
+     */
     public const string DEFAULT_KEY = '__unknown_key__';
 
     public function __construct(
@@ -30,9 +47,9 @@ class UploadRequest
         ?string $key = null,
         private bool $isPublic = true,
     ) {
-        $this->atPath($path);
-        $this->asFormat($format);
-        $this->usingKey($key);
+        $this->fromPath($path);
+        $this->withFormat($format);
+        $this->withKey($key);
     }
 
     public static function public(string $path, string $format, string $key): self
@@ -45,7 +62,7 @@ class UploadRequest
         return new self($path, $format, $key)->markAsPrivate();
     }
 
-    public function atPath(string $path): static
+    public function fromPath(string $path): static
     {
         $this->path = $this->validatePath($path);
 
@@ -68,9 +85,9 @@ class UploadRequest
         return $this->format;
     }
 
-    public function asFormat(?string $format): static
+    public function withFormat(?string $format): static
     {
-        $this->format = strtolower(trim($format ?? '')) ?: 'application/octet-stream';
+        $this->format = strtolower(trim((string) $format)) ?: self::DEFAULT_FORMAT;
 
         return $this;
     }
@@ -83,9 +100,9 @@ class UploadRequest
         return $this->key;
     }
 
-    public function usingKey(?string $key): static
+    public function withKey(?string $key): static
     {
-        if (!$key = trim($key ?? '')) {
+        if (!$key = trim((string) $key)) {
             $key = basename($this->path);
         }
 

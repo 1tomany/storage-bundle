@@ -11,10 +11,14 @@ use function trim;
 
 class DownloadRequest
 {
-    /** @var non-empty-string */
+    /**
+     * @var non-empty-string
+     */
     private string $key = self::DEFAULT_KEY;
 
-    /** @var non-empty-string */
+    /**
+     * @var non-empty-string
+     */
     private string $directory;
 
     public const string DEFAULT_KEY = '__unknown_key__';
@@ -24,7 +28,7 @@ class DownloadRequest
         string $key,
         ?string $directory = null,
     ) {
-        $this->usingKey($key);
+        $this->withKey($key);
         $this->toDirectory($directory);
     }
 
@@ -36,9 +40,9 @@ class DownloadRequest
         return $this->key;
     }
 
-    public function usingKey(?string $key): static
+    public function withKey(?string $key): static
     {
-        $this->key = trim($key ?? '') ?: self::DEFAULT_KEY;
+        $this->key = trim((string) $key) ?: self::DEFAULT_KEY;
 
         return $this;
     }

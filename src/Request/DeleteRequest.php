@@ -2,15 +2,29 @@
 
 namespace OneToMany\StorageBundle\Request;
 
+use OneToMany\StorageBundle\Exception\InvalidArgumentException;
+
 use function ltrim;
 
 class DeleteRequest
 {
-    public function __construct(private string $key)
+    /**
+     * @var non-empty-string
+     */
+    private string $key;
+
+    public function __construct(string $key)
     {
-        $this->key = ltrim($key, '/');
+        if (!$key = ltrim($key, '/')) {
+            throw new InvalidArgumentException('The key cannot be empty.');
+        }
+
+        $this->key = $key;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getKey(): string
     {
         return $this->key;
